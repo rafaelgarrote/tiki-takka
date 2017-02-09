@@ -1,0 +1,39 @@
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>discovery.log</file>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss ZZZZ} - [%level] - from %logger in %thread # %message%xException%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+
+
+
+
+    <logger name="mylogger" level="debug">
+        <appender-ref ref="stdout" />
+    </logger>
+    <logger name="mylogger" level="error">
+        <appender-ref ref="stderr" />
+    </logger>
+</configuration>

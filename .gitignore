@@ -1,0 +1,12 @@
+/discovery/src/main/resources/dev_application.conf
+/orchestration/src/main/resources/dev_application.conf
+/core/src/main/resources/dev_application.conf
+*.log
+dependency-reduced-pom.xml
+# Created by .ignore support plugin (hsz.mobi)
+#IDEA Files
+.idea/
+*.iml
+#Target
+target/
+project/
