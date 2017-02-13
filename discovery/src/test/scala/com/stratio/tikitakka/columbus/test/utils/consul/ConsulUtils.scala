@@ -26,6 +26,7 @@ import akka.http.scaladsl.model.MediaTypes
 import akka.stream.ActorMaterializer
 import play.api.libs.json.Json
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ConsulUtils {

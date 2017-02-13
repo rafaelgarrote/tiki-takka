@@ -45,7 +45,7 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
   override def beforeAll(): Unit = {
     Try {
-      registerServices(services.toList) map ()
+      registerServices(services.toList)
     } match {
       case Success(_) =>
       case Failure(error) => error.printStackTrace()
