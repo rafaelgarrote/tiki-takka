@@ -1,16 +1,14 @@
 package com.stratio.tikitakka.core
 
 import scala.language.postfixOps
-
 import akka.actor.ActorSystem
-import akka.testkit.{ TestKit, ImplicitSender }
+import akka.testkit.{ImplicitSender, TestKit}
+import com.stratio.tikitakka.columbus.test.utils.DummyDiscoveryComponent
 import org.junit.runner.RunWith
 import org.scalatest.WordSpecLike
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.ShouldMatchers
-
 import com.stratio.tikitakka.common.message.IsDiscoveryServiceUp
-import com.stratio.tikitakka.columbus.DummyDiscoveryComponent
 
 @RunWith(classOf[JUnitRunner])
 class DiscoveryActorUnitTest extends TestKit(ActorSystem("MySpec"))
