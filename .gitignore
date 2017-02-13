@@ -1,3 +1,4 @@
+/.idea
 /discovery/src/main/resources/dev_application.conf
 /orchestration/src/main/resources/dev_application.conf
 /core/src/main/resources/dev_application.conf

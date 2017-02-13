@@ -1,8 +1,9 @@
 package com.stratio.tikitakka.columbus
 
+import com.stratio.tikitakka.columbus.test.utils.DummyDiscoveryComponent
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import org.junit.runner.RunWith
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner

@@ -1,7 +1,9 @@
-package com.stratio.tikitakka.columbus
+package com.stratio.tikitakka.columbus.test.utils
 
-import scala.concurrent.Future
+import com.stratio.tikitakka.columbus.DiscoveryComponent
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait DummyDiscoveryComponent extends DiscoveryComponent {
 
