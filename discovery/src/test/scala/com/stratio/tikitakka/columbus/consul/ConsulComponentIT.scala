@@ -40,6 +40,7 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
     implicit val system: ActorSystem = ActorSystem("Actor-Test-System")
     implicit val actorMaterializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
     val timeout = 3 seconds
+    
   }
 
   override def beforeAll(): Unit = {
