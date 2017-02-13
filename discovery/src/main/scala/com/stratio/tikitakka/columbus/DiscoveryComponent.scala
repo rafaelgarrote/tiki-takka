@@ -8,4 +8,6 @@ trait DiscoveryComponent {
 
   def isUp: Future[Boolean]
 
+  def discover(tags: List[String] = List.empty[String]): Future[Map[String, List[String]]]
+
 }
