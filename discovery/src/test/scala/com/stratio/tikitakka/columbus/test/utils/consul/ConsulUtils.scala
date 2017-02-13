@@ -41,14 +41,14 @@ trait ConsulUtils {
   def registerService(service: AgentService): Unit = {
     val resource = "v1/agent/service/register"
     val body = Json.stringify(Json.toJson(service))
-    doRequest(uri, resource, HttpMethods.PUT, Some(body))
+    doRequest(uri, resource, HttpMethods.PUT, Some(body)) map( response => println(response.status.value))
   }
 
   def unregisterServices(services: List[AgentService]) = services.foreach(unregisterService)
 
   def unregisterService(service: AgentService): Unit = {
     val resource = s"v1/agent/service/deregister/${service.ID}"
-    doRequest(uri, resource, HttpMethods.GET)
+    doRequest(uri, resource, HttpMethods.GET) map( response => println(response.status.value))
   }
 
   private def doRequest(uri: String,
