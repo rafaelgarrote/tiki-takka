@@ -24,12 +24,13 @@ import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.MediaTypes
 import akka.stream.ActorMaterializer
+import com.stratio.tikitakka.common.util.LogUtils
 import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ConsulUtils {
+trait ConsulUtils extends LogUtils {
 
   implicit val system: ActorSystem
   implicit val actorMaterializer: ActorMaterializer
@@ -42,14 +43,14 @@ trait ConsulUtils {
   def registerService(service: AgentService): Unit = {
     val resource = "v1/agent/service/register"
     val body = Json.stringify(Json.toJson(service))
-    doRequest(uri, resource, HttpMethods.PUT, Some(body)) map( response => println(response.status.value))
+    doRequest(uri, resource, HttpMethods.PUT, Some(body)) map( response => logger.info(response.status.value))
   }
 
   def unregisterServices(services: List[AgentService]) = services.foreach(unregisterService)
 
   def unregisterService(service: AgentService): Unit = {
     val resource = s"v1/agent/service/deregister/${service.ID}"
-    doRequest(uri, resource, HttpMethods.GET) map( response => println(response.status.value))
+    doRequest(uri, resource, HttpMethods.GET) map( response => logger.info(response.status.value))
   }
 
   private def doRequest(uri: String,
