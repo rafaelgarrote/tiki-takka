@@ -27,7 +27,6 @@ import akka.stream.ActorMaterializer
 import com.stratio.tikitakka.common.util.LogUtils
 import play.api.libs.json.Json
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ConsulUtils extends LogUtils {
@@ -43,14 +42,14 @@ trait ConsulUtils extends LogUtils {
   def registerService(service: AgentService): Unit = {
     val resource = "v1/agent/service/register"
     val body = Json.stringify(Json.toJson(service))
-    doRequest(uri, resource, HttpMethods.PUT, Some(body)) map( response => logger.info(response.status.value))
+    doRequest(uri, resource, HttpMethods.PUT, Some(body))
   }
 
   def unregisterServices(services: List[AgentService]) = services.foreach(unregisterService)
 
   def unregisterService(service: AgentService): Unit = {
     val resource = s"v1/agent/service/deregister/${service.ID}"
-    doRequest(uri, resource, HttpMethods.GET) map( response => logger.info(response.status.value))
+    doRequest(uri, resource, HttpMethods.GET)
   }
 
   private def doRequest(uri: String,
@@ -62,7 +61,7 @@ trait ConsulUtils extends LogUtils {
   }
 
   private def createRequest(uri: String, resource: String, method: HttpMethod, body: Option[String]): HttpRequest = {
-    HttpRequest(uri = s"$uri/$resource", method = method, entity = body.map(body => HttpEntity(MediaTypes
-      .`application/json`, body)).getOrElse(""))
+    HttpRequest(uri = s"$uri/$resource", method = method,
+      entity = body.map(body => HttpEntity(MediaTypes.`application/json`, body)).getOrElse(""))
   }
 }

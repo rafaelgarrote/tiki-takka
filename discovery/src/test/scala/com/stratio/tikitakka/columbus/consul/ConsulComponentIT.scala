@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import com.stratio.tikitakka.columbus.test.utils.consul.AgentService
 import com.stratio.tikitakka.columbus.test.utils.consul.ConsulUtils
+import com.stratio.tikitakka.common.util.ConfigComponent
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.ShouldMatchers
@@ -13,8 +14,6 @@ import org.scalatest.junit.JUnitRunner
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.util.Failure
-import scala.util.Success
 import scala.util.Try
 
 @RunWith(classOf[JUnitRunner])
@@ -22,7 +21,7 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
   implicit val system = ActorSystem("Actor-Test-System")
   implicit val actorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
-  implicit val uri = "http://127.0.0.1:8500"
+  implicit val uri = ConfigComponent.config.getString(ConsulComponent.uriField)
 
   val datasourceTags = List[String]("datasource")
   val agentTags = List[String]("dg-agent")
@@ -46,9 +45,6 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   override def beforeAll(): Unit = {
     Try {
       registerServices(services.toList)
-    } match {
-      case Success(_) =>
-      case Failure(error) => error.printStackTrace()
     }
   }
 
@@ -88,9 +84,6 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   override def afterAll(): Unit = {
     Try {
       unregisterServices(services.toList)
-    } match {
-      case Success(_) =>
-      case Failure(error) => error.printStackTrace()
     }
   }
 

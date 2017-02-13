@@ -19,7 +19,7 @@ hose {
     ]
 
     ITPARAMETERS = """
-        | -Dconsul.uri="http://%%CONSUL:8500/"
+        | -Dconsul.uri="http://%%CONSUL:8500"
         | """
 
     DEV = {
