@@ -11,5 +11,22 @@
 
     <artifactId>orchestration</artifactId>
     <packaging>jar</packaging>
+    <dependencies>
+        <!-- Internal dependencies -->
+        <dependency>
+            <groupId>com.stratio.tikitakka</groupId>
+            <artifactId>common</artifactId>
+            <version>${version}</version>
+        </dependency>
 
+        <!--Main-->
+        <dependency>
+            <groupId>org.scalaz</groupId>
+            <artifactId>scalaz-core_${scala.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-json_${scala.version}</artifactId>
+        </dependency>
+    </dependencies>
 </project>

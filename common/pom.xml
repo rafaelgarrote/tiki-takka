@@ -23,5 +23,4 @@
             <artifactId>play-json_${scala.version}</artifactId>
         </dependency>
     </dependencies>
-
 </project>

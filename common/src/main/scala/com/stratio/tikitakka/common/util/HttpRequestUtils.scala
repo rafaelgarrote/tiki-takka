@@ -1,19 +1,15 @@
 package com.stratio.tikitakka.common.util
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.HttpMethods
-import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.ResponseEntity
-import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import akka.http.scaladsl.model.{HttpEntity, _}
+import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.stream.ActorMaterializer
-import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
+import play.api.libs.json.JsValue
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait HttpRequestUtils extends LazyLogging {
 
@@ -25,7 +21,7 @@ trait HttpRequestUtils extends LazyLogging {
   def doRequest[T](uri: String,
                    resource: String,
                    method: HttpMethod = HttpMethods.GET,
-                   body: Option[String] = None)(implicit ev: Unmarshaller[ResponseEntity,T]): Future[T] = {
+                   body: Option[JsValue] = None)(implicit ev: Unmarshaller[ResponseEntity, T]): Future[T] = {
     logger.debug(s"Sending HTTP request to $uri")
     val request = createRequest(uri, resource, method, body)
     for {
@@ -34,6 +30,13 @@ trait HttpRequestUtils extends LazyLogging {
     } yield entity
   }
 
-  private def createRequest(uri: String, resource: String, method: HttpMethod, body: Option[String]): HttpRequest =
-    HttpRequest(uri = s"$uri/$resource", method = method, entity = ByteString(body.getOrElse("")))
+  private def createRequest(uri: String, resource: String, method: HttpMethod, body: Option[JsValue]): HttpRequest =
+    HttpRequest(uri = s"$uri/$resource", method = method, entity = createRequestEntityJson(body))
+
+  def createRequestEntityJson(body: Option[JsValue]): RequestEntity = body match {
+    case Some(jsBody) => HttpEntity(MediaTypes.`application/json`, jsBody.toString)
+    case _ => HttpEntity.Empty
+  }
+
+
 }

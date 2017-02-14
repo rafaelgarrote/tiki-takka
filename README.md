@@ -15,6 +15,13 @@ Testing:
 + mvn test -Dmaven.surefire.debug -Dtest=XX -> Debug Unit Tests
 + mvn integration-test -Dmaven.failsafe.debug -DskipUTs -Dit.test=XX -> Debug Integration Tests 
 
+Other parameters:
++ **-Dmarathon.uri=\<uri to marathon\>** uri to locate marathon endpoint. e.j. http://localhost:8080  
+
+Requisites for integration Tests
++ A consul docker (docker run -d -p 8500:8500 consul)
++ A mesos cluster with marathon
+
 Continuos compilation
 + mvn compile scala:cc -DrecompileMode=incremental
 
@@ -30,3 +37,5 @@ Previously add a dev_application.conf file on commons/src/main/resources folder 
 
 Distribution:
 + RPM/DEB: From parent folder -> mvn package -Ppackage
+
+
