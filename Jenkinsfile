@@ -49,7 +49,6 @@ hose {
             'image': 'mesosphere/marathon:v1.3.0',
             'cmd': '--zk zk://%%ZOOKEEPER:2181/mesos',
             'sleep': 10,
-            'healthcheck': 8080,
             'env': [
                 'MARATHON_MASTER=zk://%%ZOOKEEPER:2181/mesos'
             ]

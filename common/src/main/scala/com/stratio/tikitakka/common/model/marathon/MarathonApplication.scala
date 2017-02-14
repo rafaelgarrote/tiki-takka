@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.common.model
 
-import play.api.libs.json._
+package com.stratio.tikitakka.common.model.marathon
+
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+import com.stratio.tikitakka.common.model._
 
 case class MarathonApplication(id: String,
                                cpus: Double,
@@ -24,12 +27,23 @@ case class MarathonApplication(id: String,
                                instances: Int,
                                container: MarathonContainer,
                                cmd: Option[String],
-                               healthChecks: Seq[HealthCheck],
-                               labels: Map[String, String]) extends OrchestratorApplication {
-
+                               healthChecks: Seq[MarathonHealthCheck],
+                               labels: Map[String, String]) extends ApplicationModels {
 }
 
 object MarathonApplication {
+
+  def apply(buildApp: BuildApp): MarathonApplication =
+    MarathonApplication(
+      id = buildApp.id,
+      cpus = buildApp.cpus,
+      mem = buildApp.mem,
+      instances = buildApp.instances,
+      containerId = buildApp.container.image,
+      cmd = buildApp.cmd,
+      labels = buildApp.labels
+    )
+
   def apply(id: String, cpus: Double, mem: Int, instances: Int, containerId: String, cmd: Option[String] = None,
             labels: Map[String, String] = Map.empty[String, String]): MarathonApplication =
     new MarathonApplication(
@@ -39,7 +53,7 @@ object MarathonApplication {
       instances,
       MarathonContainer(Docker(containerId, Seq.empty[DockerPortMapping])),
       cmd,
-      Seq.empty[HealthCheck],
+      Seq.empty[MarathonHealthCheck],
       labels)
 
   def fromJson(id: String,
@@ -48,9 +62,10 @@ object MarathonApplication {
                instances: Int,
                container: MarathonContainer,
                cmd: Option[String],
-               healthChecks: Seq[HealthCheck],
+               healthChecks: Seq[MarathonHealthCheck],
                labels: Map[String, String]) =
-    MarathonApplication(id.replaceFirst("^/",""),cpus, mem, instances, container, cmd, healthChecks, labels)
+    MarathonApplication(id.replaceFirst("^/", ""), cpus, mem, instances, container, cmd, healthChecks, labels)
+
   // Literals
   val idLiteral = "id"
   val cpusLiteral = "cpus"
@@ -69,15 +84,13 @@ object MarathonApplication {
       (__ \ instancesLiteral).read[Int] and
       (__ \ containerLiteral).read[MarathonContainer] and
       (__ \ cmdLiteral).readNullable[String] and
-      (__ \ healthChecksLiteral).read[Seq[HealthCheck]] and
+      (__ \ healthChecksLiteral).read[Seq[MarathonHealthCheck]] and
       (__ \ labelsLiteral).read[Map[String, String]]
-    ) (MarathonApplication.fromJson _)
+    )(MarathonApplication.fromJson _)
 }
-
 
 case class MarathonContainer(docker: Docker, `type`: String = "DOCKER")
 
-// Crear alias
 object MarathonContainer {
 
   val dockerLiteral: String = "docker"
@@ -108,13 +121,12 @@ object DockerPortMapping {
 
   implicit val writes: Writes[DockerPortMapping] = Json.writes[DockerPortMapping]
   implicit val reads: Reads[DockerPortMapping] = Json.reads[DockerPortMapping]
-
 }
 
-case class HealthCheck(id: String)
+case class MarathonHealthCheck(id: String)
 
-object HealthCheck {
-  implicit val writes: Writes[HealthCheck] = Json.writes[HealthCheck]
-  implicit val reads: Reads[HealthCheck] = Json.reads[HealthCheck]
+object MarathonHealthCheck {
 
+  implicit val writes: Writes[MarathonHealthCheck] = Json.writes[MarathonHealthCheck]
+  implicit val reads: Reads[MarathonHealthCheck] = Json.reads[MarathonHealthCheck]
 }

@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.xavi
-
-import com.stratio.tikitakka.common.model.OrchestratorApplication
+package com.stratio.tikitakka.updown
 
 import scala.concurrent.Future
 
-trait Orchestrator[T <: OrchestratorApplication] {
+import com.stratio.tikitakka.common.model.AppInfo
+import com.stratio.tikitakka.common.model.BuildApp
 
-  type UpResponse
-  type DownResponse
+trait UpAndDownComponent {
 
-  def upApplication(component: T): Future[UpResponse]
+  def upApplication(application: BuildApp): Future[AppInfo]
 
-  def downApplication(component: T): Future[DownResponse]
+  def downApplication(application: AppInfo): Future[AppInfo]
 
 }

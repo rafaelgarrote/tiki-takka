@@ -20,13 +20,18 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{ShouldMatchers, WordSpec}
 import play.api.libs.json._
 
+import com.stratio.tikitakka.common.model.marathon.Docker
+import com.stratio.tikitakka.common.model.marathon.DockerPortMapping
+import com.stratio.tikitakka.common.model.marathon.MarathonContainer
+import com.stratio.tikitakka.common.model.marathon.MarathonHealthCheck
+
 @RunWith(classOf[JUnitRunner])
 class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
 
   "MarathonComponent" should {
     "be written as json correctly" in {
       val labelsMap = Map("thisIsAKey" -> "thisIsAValue", "ThisIsAnotherKey" -> "ThisIsAnotherValue")
-      val component = MarathonApplication("andId", 0.2, 256, 2, "containerId", Some("bash -x ls"), labelsMap)
+      val component = marathon.MarathonApplication("andId", 0.2, 256, 2, "containerId", Some("bash -x ls"), labelsMap)
 
       val result = Json.toJson(component).asInstanceOf[JsObject]
 
@@ -43,17 +48,17 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
 
     "be read fron json correctly" in {
       val expectedComponent =
-        MarathonApplication(
+        marathon.MarathonApplication(
           "app1", 0.2, 100, 1,
           MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21)))),
-          None, Seq.empty[HealthCheck], Map("tag" -> "tag1,tag2"))
+          None, Seq.empty[MarathonHealthCheck], Map("tag" -> "tag1,tag2"))
 
       val text =
         io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("component-marathon.json")).mkString
 
       val json = Json.parse(text)
       val jsonComponent = json.asInstanceOf[JsArray].head.get
-      val resultComponent = jsonComponent.as[MarathonApplication]
+      val resultComponent = jsonComponent.as[marathon.MarathonApplication]
       resultComponent shouldBe expectedComponent
     }
   }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.xavi.marathon
+package com.stratio.tikitakka.updown.marathon
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
@@ -22,7 +22,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{ShouldMatchers, WordSpec}
 
 @RunWith(classOf[JUnitRunner])
-class MarathonOrchestratorUnitTest extends WordSpec with ShouldMatchers {
+class MarathonComponentUnitTest extends WordSpec with ShouldMatchers {
 
   trait ActorTestSystem {
     implicit val system = ActorSystem("Actor-Test-System")
@@ -30,7 +30,7 @@ class MarathonOrchestratorUnitTest extends WordSpec with ShouldMatchers {
   }
 
   "Marathon Orchestrator" should {
-    "recover the uri correctly" in new MarathonOrchestrator with ActorTestSystem {
+    "recover the uri correctly" in new MarathonComponent with ActorTestSystem {
       uri shouldBe "http://localhost:8080"
     }
   }

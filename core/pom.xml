@@ -31,6 +31,18 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.tikitakka</groupId>
+            <artifactId>orchestration</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.tikitakka</groupId>
+            <artifactId>orchestration</artifactId>
+            <version>${version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!--External dependencies-->
         <dependency>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.xavi
+package com.stratio.tikitakka.updown
 
 import com.stratio.tikitakka.common.exceptions.ResponseException
 import org.junit.runner.RunWith
@@ -23,29 +23,31 @@ import org.scalatest.{ShouldMatchers, WordSpec}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+import com.stratio.tikitakka.common.model.AppInfo
+
 @RunWith(classOf[JUnitRunner])
-class OrchestratorUnitTest extends WordSpec with ShouldMatchers {
+class UpAndDownComponentUnitTest extends WordSpec with ShouldMatchers {
 
   trait ImplicitsValues {
     implicit val timeout = 5 seconds
   }
 
   "A Orchestration component" should {
-    "can up a component" in new DummyOrchestration with ImplicitsValues {
-      Await.result(upApplication(validComponent), timeout) shouldBe (right = "{}")
+    "can up a component" in new DummyUpAndDownComponent with ImplicitsValues {
+      Await.result(upApplication(validBuild), timeout) shouldBe (right = AppInfo(validBuild.id))
     }
 
-    "cannot up a component if this is not correct" in new DummyOrchestration with ImplicitsValues {
-      an[ResponseException] should be thrownBy Await.result(upApplication(invalidComponent), timeout)
+    "cannot up a component if this is not correct" in new DummyUpAndDownComponent with ImplicitsValues {
+      an[ResponseException] should be thrownBy Await.result(upApplication(invalidBuild), timeout)
 
     }
-    "can down a component" in new DummyOrchestration with ImplicitsValues {
-      Await.result(downApplication(validComponent), timeout) shouldBe (right = true)
+    "can down a component" in new DummyUpAndDownComponent with ImplicitsValues {
+      Await.result(downApplication(AppInfo(validBuild.id)), timeout) shouldBe (right = AppInfo(validBuild.id))
     }
 
-    "cannot down a component if this is not correct" in new DummyOrchestration with ImplicitsValues {
-      val component = "invalidComponent"
-      an[ResponseException] should be thrownBy Await.result(downApplication(invalidComponent), timeout)
+    "cannot down a component if this is not correct" in new DummyUpAndDownComponent with ImplicitsValues {
+      val component = "invalidBuild"
+      an[ResponseException] should be thrownBy Await.result(downApplication(AppInfo(invalidBuild.id)), timeout)
     }
 
   }

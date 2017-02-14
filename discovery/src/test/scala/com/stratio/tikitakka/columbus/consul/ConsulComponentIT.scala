@@ -82,9 +82,8 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   }
 
   override def afterAll(): Unit = {
-    Try {
-      unregisterServices(services.toList)
-    }
+    unregisterServices(services.toList)
+    Thread.sleep(5000)
   }
 
 }

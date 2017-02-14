@@ -20,6 +20,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{ShouldMatchers, WordSpec}
 import play.api.libs.json.{JsObject, JsString, Json}
 
+import com.stratio.tikitakka.common.model.marathon.MarathonDeleteInfo
 
 @RunWith(classOf[JUnitRunner])
 class MarathonDeleteInfoUnitTest extends WordSpec with ShouldMatchers {

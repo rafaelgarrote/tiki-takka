@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.xavi.marathon
+package com.stratio.tikitakka.updown.marathon
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{HttpMethods, ResponseEntity}
 import akka.stream.ActorMaterializer
-import com.stratio.tikitakka.common.model.MarathonApplication
+import com.stratio.tikitakka.common.model.marathon.MarathonApplication
 import com.stratio.tikitakka.common.util.HttpRequestUtils
 import play.api.libs.json.Json
 
