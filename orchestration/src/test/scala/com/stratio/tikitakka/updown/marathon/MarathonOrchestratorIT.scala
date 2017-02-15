@@ -27,8 +27,8 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-import com.stratio.tikitakka.common.model.AppInfo
-import com.stratio.tikitakka.common.model.BuildApp
+import com.stratio.tikitakka.common.model.ContainerInfo
+import com.stratio.tikitakka.common.model.CreateApp
 import com.stratio.tikitakka.common.model.Container
 import com.stratio.tikitakka.common.model.marathon.MarathonApplication
 
@@ -46,7 +46,7 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
     "Up a application if it is correctly defined" in new MarathonComponent with ActorTestSystem with
       MarathonTestsUtils {
       val application =
-        BuildApp(
+        CreateApp(
           id = "app1",
           cpus = 0.2,
           mem = 100,
@@ -55,8 +55,8 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
           cmd = Option("tail -f /var/log/yum.log")
         )
       val testResult = Try{
-        val result: Future[AppInfo] = upApplication(application)
-        Await.result(result, timeout) shouldBe an[AppInfo]
+        val result: Future[ContainerInfo] = upApplication(application)
+        Await.result(result, timeout) shouldBe an[ContainerInfo]
         Await.result(result, timeout).id shouldBe application.id
       }
       Await.result(destroyApplication(application.id), timeout)
@@ -65,26 +65,26 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
   }
   "thrown an exception when the endpoint is not correctly defined" in new MarathonComponent with ActorTestSystem {
     override lazy val uri = "http://ocalhost:8080"
-    val application = BuildApp("app1", 0.2, 100, 1, Container("centos:7", Seq()))
+    val application = CreateApp("app1", 0.2, 100, 1, Container("centos:7", Seq()))
     an[ResponseException] should be thrownBy Await.result(upApplication(application), timeout)
   }
 
   "Down a application if it the app is defined" in new MarathonComponent with ActorTestSystem with MarathonTestsUtils {
     val application = MarathonApplication("app2", 0.2, 100, 1, "centos:7", Some("tail -f /var/log/yum.log"))
 
-    val result: Future[AppInfo] =
+    val result: Future[ContainerInfo] =
       for {
         _ <- createApplication(application)
-        result <- downApplication(AppInfo(application.id))
+        result <- downApplication(ContainerInfo(application.id))
       } yield result
 
-    Await.result(result, timeout) shouldBe an[AppInfo]
+    Await.result(result, timeout) shouldBe an[ContainerInfo]
   }
 
   "thrown an exception when the application doesn't exist" in new MarathonComponent with ActorTestSystem {
     override lazy val uri = "http://localhost:8080"
 
-    val application = AppInfo(id = "this-id-is-a-fake")
+    val application = ContainerInfo(id = "this-id-is-a-fake")
 
     an[ResponseException] should be thrownBy Await.result(downApplication(application), timeout)
   }

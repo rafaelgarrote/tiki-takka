@@ -2,7 +2,7 @@ package com.stratio.tikitakka.common.model
 
 trait ApplicationModels
 
-case class BuildApp(id: String,
+case class CreateApp(id: String,
                      cpus: Double,
                      mem: Int,
                      instances: Int,
@@ -11,7 +11,7 @@ case class BuildApp(id: String,
                      healthChecks: Seq[HealthCheck] = Seq.empty[HealthCheck],
                      labels: Map[String, String] = Map.empty[String, String]) extends ApplicationModels
 
-case class AppInfo(id: String)
+case class ContainerInfo(id: String)
 
 case class Container(image: String, portMappings: Seq[PortMapping])
 

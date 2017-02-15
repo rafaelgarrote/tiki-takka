@@ -8,7 +8,7 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import akka.pattern.pipe
 import com.stratio.tikitakka.common.message._
-import com.stratio.tikitakka.common.model.AppInfo
+import com.stratio.tikitakka.common.model.ContainerInfo
 import com.stratio.tikitakka.updown.UpAndDownComponent
 
 class UpAndDownActor(service: UpAndDownComponent) extends Actor with ActorLogging {
@@ -18,7 +18,7 @@ class UpAndDownActor(service: UpAndDownComponent) extends Actor with ActorLoggin
       service.upApplication(buildApp)
         .map(UpServiceResponse)
         .recover { case (ex: Throwable) =>
-          UpServiceFails(AppInfo(buildApp.id), ex.getMessage)
+          UpServiceFails(ContainerInfo(buildApp.id), ex.getMessage)
         }
         .pipeTo(sender)
 

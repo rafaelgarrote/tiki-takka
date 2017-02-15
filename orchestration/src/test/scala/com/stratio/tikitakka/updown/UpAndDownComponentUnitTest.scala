@@ -23,7 +23,7 @@ import org.scalatest.{ShouldMatchers, WordSpec}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-import com.stratio.tikitakka.common.model.AppInfo
+import com.stratio.tikitakka.common.model.ContainerInfo
 
 @RunWith(classOf[JUnitRunner])
 class UpAndDownComponentUnitTest extends WordSpec with ShouldMatchers {
@@ -34,7 +34,7 @@ class UpAndDownComponentUnitTest extends WordSpec with ShouldMatchers {
 
   "A Orchestration component" should {
     "can up a component" in new DummyUpAndDownComponent with ImplicitsValues {
-      Await.result(upApplication(validBuild), timeout) shouldBe (right = AppInfo(validBuild.id))
+      Await.result(upApplication(validBuild), timeout) shouldBe (right = ContainerInfo(validBuild.id))
     }
 
     "cannot up a component if this is not correct" in new DummyUpAndDownComponent with ImplicitsValues {
@@ -42,12 +42,12 @@ class UpAndDownComponentUnitTest extends WordSpec with ShouldMatchers {
 
     }
     "can down a component" in new DummyUpAndDownComponent with ImplicitsValues {
-      Await.result(downApplication(AppInfo(validBuild.id)), timeout) shouldBe (right = AppInfo(validBuild.id))
+      Await.result(downApplication(ContainerInfo(validBuild.id)), timeout) shouldBe (right = ContainerInfo(validBuild.id))
     }
 
     "cannot down a component if this is not correct" in new DummyUpAndDownComponent with ImplicitsValues {
       val component = "invalidBuild"
-      an[ResponseException] should be thrownBy Await.result(downApplication(AppInfo(invalidBuild.id)), timeout)
+      an[ResponseException] should be thrownBy Await.result(downApplication(ContainerInfo(invalidBuild.id)), timeout)
     }
 
   }

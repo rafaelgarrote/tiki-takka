@@ -33,7 +33,7 @@ case class MarathonApplication(id: String,
 
 object MarathonApplication {
 
-  def apply(buildApp: BuildApp): MarathonApplication =
+  def apply(buildApp: CreateApp): MarathonApplication =
     MarathonApplication(
       id = buildApp.id,
       cpus = buildApp.cpus,

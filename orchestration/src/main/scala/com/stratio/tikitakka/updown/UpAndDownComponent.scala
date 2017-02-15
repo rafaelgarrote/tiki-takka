@@ -17,13 +17,13 @@ package com.stratio.tikitakka.updown
 
 import scala.concurrent.Future
 
-import com.stratio.tikitakka.common.model.AppInfo
-import com.stratio.tikitakka.common.model.BuildApp
+import com.stratio.tikitakka.common.model.ContainerInfo
+import com.stratio.tikitakka.common.model.CreateApp
 
 trait UpAndDownComponent {
 
-  def upApplication(application: BuildApp): Future[AppInfo]
+  def upApplication(application: CreateApp): Future[ContainerInfo]
 
-  def downApplication(application: AppInfo): Future[AppInfo]
+  def downApplication(application: ContainerInfo): Future[ContainerInfo]
 
 }
