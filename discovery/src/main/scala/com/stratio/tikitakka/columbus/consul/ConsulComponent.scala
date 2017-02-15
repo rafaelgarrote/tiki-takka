@@ -55,7 +55,7 @@ trait ConsulComponent extends DiscoveryComponent with HttpRequestUtils with LogU
       response match {
         case x :: _ =>
           Some(DiscoveryAppInfo(
-            response.head.ID,
+            response.head.ID.getOrElse(response.head.ServiceName), //Future versions will have ID
             response.head.ServiceName,
             response.map(_.toDiscoveryServiceInfo),
             response.map(_.ServiceTags).reduce(_ ++ _)

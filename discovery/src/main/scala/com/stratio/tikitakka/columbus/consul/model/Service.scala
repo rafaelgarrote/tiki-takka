@@ -21,7 +21,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
 case class Service(
-                    ID: String,
+                    ID: Option[String], //Future versions will have ID when it happens remove Option
                     Node: String,
                     Address: String,
                     CreateIndex: Int,
