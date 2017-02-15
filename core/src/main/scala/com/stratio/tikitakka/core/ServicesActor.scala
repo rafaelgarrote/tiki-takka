@@ -24,6 +24,7 @@ import akka.actor.Props
 import com.stratio.tikitakka.common.message.AppUnDiscovered
 import com.stratio.tikitakka.common.message.AppsDiscovered
 import com.stratio.tikitakka.common.message.ManageApp
+import com.stratio.tikitakka.common.util.ConfigComponent
 
 import scalaz.Reader
 import scala.concurrent.duration._
@@ -32,8 +33,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ServicesActor(orchestrator: ActorRef) extends Actor with ActorLogging {
 
   var services = Map[String, Cancellable]()
-  lazy val discoverInitialDelayInSeconds = 5 second
-  lazy val discoverIntervalInSeconds = 5 second
+  lazy val discoverInitialDelayInSeconds = ConfigComponent.getInt("discover.initial.delay.in.seconds", 5) second
+  lazy val discoverIntervalInSeconds = ConfigComponent.getInt("discover.interval.in.seconds", 5) second
 
   override def receive: Receive = {
 

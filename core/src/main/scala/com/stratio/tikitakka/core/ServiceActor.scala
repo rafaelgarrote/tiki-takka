@@ -45,7 +45,6 @@ class ServiceActor(discoveryActor: ActorRef, orchestrator: ActorRef) extends Act
   def ready: Receive = {
     case AppDiscovered(Some(appDiscovered)) =>
       log.info(s"[${appDiscovered.name}] discovered with id: ${appDiscovered.id}")
-      log.debug(s"[${appDiscovered.name}] discovered with service: ${appDiscovered.tags.reduce(_ + ", " +  _)}")
 
       if(Option(appDiscovered) != status) {
         status = Option(appDiscovered)

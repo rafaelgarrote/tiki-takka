@@ -12,7 +12,7 @@ import com.stratio.tikitakka.common.model.ContainerInfo
 import com.stratio.tikitakka.updown.DummyUpAndDownComponent
 
 @RunWith(classOf[JUnitRunner])
-class UpAndDownActorUnitTest extends TestKit(ActorSystem("MySpec"))
+class UpAndDownActorTest extends TestKit(ActorSystem("MySpec"))
 with ImplicitSender
 with WordSpecLike
 with ShouldMatchers {

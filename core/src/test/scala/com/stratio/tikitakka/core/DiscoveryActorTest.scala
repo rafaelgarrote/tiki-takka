@@ -18,7 +18,7 @@ import com.stratio.tikitakka.common.message.IsDiscoveryServiceUp
 import com.stratio.tikitakka.common.model.discovery.DiscoveryAppInfo
 
 @RunWith(classOf[JUnitRunner])
-class DiscoveryActorUnitTest extends TestKit(ActorSystem("MySpec"))
+class DiscoveryActorTest extends TestKit(ActorSystem("MySpec"))
   with ImplicitSender
   with WordSpecLike
   with ShouldMatchers {
