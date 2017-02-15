@@ -40,7 +40,7 @@ class ServicesActorTest extends TestKit(ActorSystem("MySpec"))
     "create new child actors when a Apps Discovered message arrived and the apps are not managed" in {
 
       val services = (0 to 4).map(_ => AgentService.randomObject)
-      val servicesDiscovered = services.map(s => s.Name -> s.Tags).toMap
+      val servicesDiscovered = services.map(s => s.Service -> s.Tags).toMap
       val orchestratorActor = TestProbe()
       val serviceActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
 
@@ -53,7 +53,7 @@ class ServicesActorTest extends TestKit(ActorSystem("MySpec"))
     "when a Apps Discovered message arrive create just the new childs for apps are not already managed" in {
 
       val services = (0 to 4).map(_ => AgentService.randomObject)
-      val servicesDiscovered = services.map(s => s.Name -> s.Tags).toMap
+      val servicesDiscovered = services.map(s => s.Service -> s.Tags).toMap
       val orchestratorActor = TestProbe()
       val serviceActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
       serviceActor.underlyingActor.services = Map[String, Cancellable](servicesDiscovered.keySet.head -> null)
@@ -67,7 +67,7 @@ class ServicesActorTest extends TestKit(ActorSystem("MySpec"))
     "when a AppUnDiscovered message arrive, cancel child actor and remove it form services map" in {
 
       val services = (0 to 4).map(_ => AgentService.randomObject)
-      val servicesDiscovered = services.map(s => s.Name -> s.Tags).toMap
+      val servicesDiscovered = services.map(s => s.Service -> s.Tags).toMap
       val orchestratorActor = TestProbe()
       val serviceActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
 

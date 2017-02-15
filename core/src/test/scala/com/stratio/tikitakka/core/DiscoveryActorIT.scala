@@ -25,6 +25,7 @@ import akka.testkit.TestProbe
 import com.stratio.tikitakka.columbus.consul.ConsulComponent
 import com.stratio.tikitakka.columbus.test.utils.consul.AgentService
 import com.stratio.tikitakka.columbus.test.utils.consul.ConsulUtils
+import com.stratio.tikitakka.columbus.test.utils.consul.UnregisterService
 import com.stratio.tikitakka.common.message.AppsDiscovered
 import com.stratio.tikitakka.common.message.DiscoverServices
 import com.stratio.tikitakka.common.util.ConfigComponent
@@ -33,6 +34,9 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpecLike
 import org.scalatest.junit.JUnitRunner
+import scala.concurrent.duration._
+
+import scala.concurrent.Await
 
 @RunWith(classOf[JUnitRunner])
 class DiscoveryActorIT extends TestKit(ActorSystem("MySpec"))
@@ -46,11 +50,16 @@ class DiscoveryActorIT extends TestKit(ActorSystem("MySpec"))
   implicit val actorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
   implicit val uri = ConfigComponent.config.getString(ConsulComponent.uriField)
 
-  val services = (0 to 4).map(_ => AgentService.randomObject)
-  val servicesMap = services.map(s => s.Name -> s.Tags) ++ Map[String, List[String]]("consul" -> List.empty[String])
+  val services = (0 to 4).map(_ => AgentService.randomObject.copy(Tags = List[String]("theTag")))
+  val servicesMap = services.map(s => s.Service -> s.Tags) ++ Map[String, List[String]]("consul" -> List.empty[String])
+  val datacenter = Await.result(getDatacenter, 3 seconds)
+  val nodeCatalog = Await.result(getNode, 3 seconds)
+  val catalogServices = services.map { service => service.toCatalogService(datacenter, nodeCatalog)}
+  val unregisterServiceModels = catalogServices.map { c => UnregisterService(c.Datacenter, c.Node, c.Service.ID)}
+  val timeout = 3 seconds
 
   override def beforeAll(): Unit = {
-    registerServices(services.toList)
+    Await.result(registerServices(catalogServices.toList), timeout)
   }
 
   "Discovery Actor" should {
@@ -59,16 +68,18 @@ class DiscoveryActorIT extends TestKit(ActorSystem("MySpec"))
 
       val orchestratorActor = TestProbe()
       val service = ConsulComponent(system, actorMaterializer)
-      val serviceActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
-      val discoveryActor = TestActorRef[DiscoveryActor](new DiscoveryActor(service, serviceActor))
+      val servicesActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
+      val discoveryActor = TestActorRef[DiscoveryActor](new DiscoveryActor(service, servicesActor))
 
       discoveryActor ! DiscoverServices(List.empty[String])
       expectMsg(AppsDiscovered(servicesMap.toMap))
+      Thread.sleep(1000)
+      servicesActor.underlyingActor.services.keys should contain theSameElementsAs servicesMap.toMap.keySet
+      servicesMap.toMap.keySet.foreach(k => servicesActor.underlyingActor.context.child(k) should not be None)
     }
   }
 
   override def afterAll(): Unit = {
-    unregisterServices(services.toList)
-    Thread.sleep(10000)
+    Await.result(unregisterServices(unregisterServiceModels.toList), timeout)
   }
 }
