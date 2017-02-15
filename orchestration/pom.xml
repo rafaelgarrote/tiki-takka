@@ -16,7 +16,6 @@
         <dependency>
             <groupId>com.stratio.tikitakka</groupId>
             <artifactId>common</artifactId>
-            <version>${version}</version>
         </dependency>
 
         <!--Main-->
