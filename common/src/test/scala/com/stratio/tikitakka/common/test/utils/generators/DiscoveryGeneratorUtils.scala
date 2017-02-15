@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scala.com.stratio.tikitakka.common.test.utils.generators
+package com.stratio.tikitakka.common.test.utils.generators
 
 import com.stratio.tikitakka.common.model.discovery.DiscoveryAppInfo
 import com.stratio.tikitakka.common.model.discovery.ServiceInfo

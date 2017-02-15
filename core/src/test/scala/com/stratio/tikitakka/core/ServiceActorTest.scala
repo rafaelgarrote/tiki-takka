@@ -28,7 +28,7 @@ import org.scalatest.ShouldMatchers
 import org.scalatest.WordSpecLike
 import org.scalatest.junit.JUnitRunner
 
-import scala.com.stratio.tikitakka.common.test.utils.generators.DiscoveryGeneratorUtils
+import com.stratio.tikitakka.common.test.utils.generators.DiscoveryGeneratorUtils
 
 @RunWith(classOf[JUnitRunner])
 class ServiceActorTest extends TestKit(ActorSystem("MySpec"))

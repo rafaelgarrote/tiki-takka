@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scala.com.stratio.tikitakka.common.test.utils.generators
+package com.stratio.tikitakka.common.test.utils.generators
 
 import org.scalacheck.Gen
 
@@ -39,7 +39,7 @@ trait GeneratorUtils {
 
   def genID: Gen[String] = for {
     name <- Gen.oneOf[String](exampleServiceName)
-    n <- Gen.choose(1, 100)
+    n <- Gen.choose(1, 1000000)
   } yield s"$name-$n"
 
 }

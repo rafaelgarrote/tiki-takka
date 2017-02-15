@@ -15,28 +15,10 @@
  */
 package com.stratio.tikitakka.columbus.test.utils.consul
 
+import com.stratio.tikitakka.common.test.utils.generators.GeneratorUtils
 import org.scalacheck.Gen
 
-object ConsulGeneratorUtils {
-
-  val exampleServiceName = List[String]("elastic", "postgres", "cassandra", "dg-agent")
-
-  def genTags: Gen[List[String]] =
-    for {
-      sz <- Gen.choose(0, 4)
-      tags <- Gen.listOfN(sz, Gen.oneOf("datasource", "elasticsearch", "postgresql", "cassandra"))
-    }  yield tags.distinct
-
-  def genIP: Gen[String] = for {
-    x <- Gen.choose(127,186)
-    y <- Gen.choose(0,18)
-    z <- Gen.choose(0,18)
-  } yield s"$x.0.$y.$z"
-
-  def genID: Gen[String] = for {
-    name <- Gen.oneOf[String](exampleServiceName)
-    n <- Gen.choose(1, 1000000)
-  } yield s"$name-$n"
+object ConsulGeneratorUtils extends GeneratorUtils {
 
   def genAgentService: Gen[AgentService] = for {
     id <- genID
