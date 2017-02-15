@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2015 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.tikitakka.columbus.consul
 
 import akka.actor.ActorSystem
@@ -5,6 +20,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import com.stratio.tikitakka.columbus.test.utils.consul.AgentService
 import com.stratio.tikitakka.columbus.test.utils.consul.ConsulUtils
+import com.stratio.tikitakka.columbus.test.utils.consul.UnregisterService
 import com.stratio.tikitakka.common.util.ConfigComponent
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfterAll
@@ -14,7 +30,6 @@ import org.scalatest.junit.JUnitRunner
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.util.Try
 
 @RunWith(classOf[JUnitRunner])
 class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfterAll with ConsulUtils {
@@ -29,8 +44,12 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   val datasourceServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = datasourceTags))
   val agentServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = agentTags))
   val services = datasourceServices ++ agentServices
-  val datasourceServiceMap = datasourceServices.map(s => s.Name -> s.Tags).toMap
-  val agentServiceMap = agentServices.map(s => s.Name -> s.Tags).toMap
+  val datacenter = Await.result(getDatacenter, 3 seconds)
+  val nodeCatalog = Await.result(getNode, 3 seconds)
+  val catalogServices = services.map { service => service.toCatalogService(datacenter, nodeCatalog)}
+  val unregisterServiceModels = catalogServices.map { c => UnregisterService(c.Datacenter, c.Node, c.Service.ID)}
+  val datasourceServiceMap = datasourceServices.map(s => s.Service -> s.Tags).toMap
+  val agentServiceMap = agentServices.map(s => s.Service -> s.Tags).toMap
   val taggedServicesMap = datasourceServiceMap ++ agentServiceMap
   val servicesMap = taggedServicesMap ++ Map[String, List[String]]("consul" -> List.empty[String])
 
@@ -42,10 +61,8 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
   }
 
-  override def beforeAll(): Unit = {
-    Try {
-      registerServices(services.toList)
-    }
+  override def beforeAll(): Unit = new ActorTestSystem {
+    Await.result(registerServices(catalogServices.toList), timeout)
   }
 
   "ConsulComponent" should {
@@ -81,9 +98,8 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
   }
 
-  override def afterAll(): Unit = {
-    unregisterServices(services.toList)
-    Thread.sleep(10000)
+  override def afterAll(): Unit = new ActorTestSystem {
+    Await.result(unregisterServices(unregisterServiceModels.toList), timeout)
   }
 
 }

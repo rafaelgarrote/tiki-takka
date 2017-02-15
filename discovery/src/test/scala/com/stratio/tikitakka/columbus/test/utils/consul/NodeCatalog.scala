@@ -19,32 +19,16 @@ import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
-case class AgentService(
-                        ID: String,
-                        Service: String,
-                        Tags: List[String],
+case class NodeCatalog(
+                        ID: Option[String],
+                        Node: String,
                         Address: String,
-                        Port: Int
-                      ) {
+                        CreateIndex: Int,
+                        ModifyIndex: Int
+                        )
 
+object NodeCatalog {
 
-  def toCatalogService(datacenter: String, nodeCatalog: NodeCatalog): CatalogService =
-    CatalogService(
-      datacenter,
-      nodeCatalog.ID,
-      nodeCatalog.Node,
-      nodeCatalog.Address,
-      None,
-      None,
-      this,
-      CheckInfo(nodeCatalog.Node, s"service:$ID", "", "", "passing", ID)
-    )
-}
-
-object AgentService {
-
-  implicit val writer: Writes[AgentService] = Json.writes[AgentService]
-  implicit val reads: Reads[AgentService] = Json.reads[AgentService]
-
-  def randomObject = ConsulGeneratorUtils.genAgentService.sample.get
+  implicit val writer: Writes[NodeCatalog] = Json.writes[NodeCatalog]
+  implicit val reads: Reads[NodeCatalog] = Json.reads[NodeCatalog]
 }

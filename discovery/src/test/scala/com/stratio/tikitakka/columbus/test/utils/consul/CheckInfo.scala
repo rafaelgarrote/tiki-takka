@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.columbus.test.utils
+package com.stratio.tikitakka.columbus.test.utils.consul
 
-import com.stratio.tikitakka.columbus.DiscoveryComponent
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+case class CheckInfo(
+                      Node: String,
+                      CheckID: String,
+                      Name: String,
+                      Notes: String,
+                      Status: String,
+                      ServiceID: String
+                      )
 
-trait DummyDiscoveryComponent extends DiscoveryComponent {
+object CheckInfo {
 
-  val uri: String
-
-  val upHost = "upHost"
-  val servicesDiscovered = Map.empty[String, List[String]]
-
-  def isUp = if (uri == upHost) Future(true) else Future(false)
-
-  def discover(tags: List[String] = List.empty[String]): Future[Map[String, List[String]]] =
-    Future(servicesDiscovered)
+  implicit val writer: Writes[CheckInfo] = Json.writes[CheckInfo]
+  implicit val reads: Reads[CheckInfo] = Json.reads[CheckInfo]
 
 }

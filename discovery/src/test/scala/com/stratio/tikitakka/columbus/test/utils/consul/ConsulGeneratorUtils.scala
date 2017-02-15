@@ -35,15 +35,14 @@ object ConsulGeneratorUtils {
 
   def genID: Gen[String] = for {
     name <- Gen.oneOf[String](exampleServiceName)
-    n <- Gen.choose(1, 100)
+    n <- Gen.choose(1, 1000000)
   } yield s"$name-$n"
 
   def genAgentService: Gen[AgentService] = for {
     id <- genID
-    name = id
+    service = id
     tags <- genTags
     address <- genIP
     port <- Gen.choose(80, 50000)
-    enableTagOverride <- Gen.oneOf(true, false)
-  } yield AgentService(id, name, tags, address, port, enableTagOverride)
+  } yield AgentService(id, service, tags, address, port)
 }

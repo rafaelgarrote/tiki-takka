@@ -23,12 +23,17 @@ import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.MediaTypes
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import play.api.libs.json.Json
+import com.typesafe.scalalogging.LazyLogging
+import play.api.libs.json._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-trait ConsulUtils {
+import NodeCatalog._
+
+trait ConsulUtils extends LazyLogging {
 
   implicit val system: ActorSystem
   implicit val actorMaterializer: ActorMaterializer
@@ -36,19 +41,35 @@ trait ConsulUtils {
 
   lazy val httpSystem = Http(system)
 
-  def registerServices(services: List[AgentService]): Unit = services.foreach(registerService)
+  def registerServices(services: List[CatalogService]): Future[List[HttpResponse]] =
+    Future.sequence(services.map(registerService))
 
-  def registerService(service: AgentService): Unit = {
-    val resource = "v1/agent/service/register"
+  def registerService(service: CatalogService): Future[HttpResponse] = {
+    val resource = "v1/catalog/register"
     val body = Json.stringify(Json.toJson(service))
     doRequest(uri, resource, HttpMethods.PUT, Some(body))
   }
 
-  def unregisterServices(services: List[AgentService]) = services.foreach(unregisterService)
+  def unregisterServices(services: List[UnregisterService]): Future[List[HttpResponse]] =
+    Future.sequence(services.map(unregisterService))
 
-  def unregisterService(service: AgentService): Unit = {
-    val resource = s"v1/agent/service/deregister/${service.ID}"
-    doRequest(uri, resource, HttpMethods.GET)
+  def unregisterService(service: UnregisterService): Future[HttpResponse] = {
+    val resource = s"v1/catalog/deregister"
+    val body = Json.stringify(Json.toJson(service))
+    doRequest(uri, resource, HttpMethods.PUT, Some(body))
+  }
+
+  def getDatacenter: Future[String] =
+    for {
+      response <- doRequest(uri, "v1/catalog/datacenters", HttpMethods.GET)
+      result <- Unmarshal(response.entity).to[String]
+    } yield Json.parse(result).as[List[String]].head
+
+  def getNode: Future[NodeCatalog] = {
+    for {
+      response <- doRequest(uri, "v1/catalog/nodes", HttpMethods.GET)
+      result <- Unmarshal(response.entity).to[String]
+    } yield Json.parse(result).as[List[NodeCatalog]].head
   }
 
   private def doRequest(uri: String,

@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.columbus.test.utils
+package com.stratio.tikitakka.columbus.test.utils.consul
 
-import com.stratio.tikitakka.columbus.DiscoveryComponent
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+case class UnregisterService(
+                              Datacenter: String,
+                              Node: String,
+                              ServiceID: String
+                              )
 
-trait DummyDiscoveryComponent extends DiscoveryComponent {
+object UnregisterService {
 
-  val uri: String
-
-  val upHost = "upHost"
-  val servicesDiscovered = Map.empty[String, List[String]]
-
-  def isUp = if (uri == upHost) Future(true) else Future(false)
-
-  def discover(tags: List[String] = List.empty[String]): Future[Map[String, List[String]]] =
-    Future(servicesDiscovered)
-
+  implicit val writer: Writes[UnregisterService] = Json.writes[UnregisterService]
+  implicit val reads: Reads[UnregisterService] = Json.reads[UnregisterService]
 }
