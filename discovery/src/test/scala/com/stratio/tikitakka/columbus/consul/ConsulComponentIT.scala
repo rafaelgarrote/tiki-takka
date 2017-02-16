@@ -40,10 +40,14 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
   val datasourceTags = List[String]("datasource")
   val agentTags = List[String]("dg-agent")
+  val appServiceTags = List[String]("app-services")
   val allTags = datasourceTags ++ agentTags
   val datasourceServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = datasourceTags))
   val agentServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = agentTags))
-  val services = datasourceServices ++ agentServices
+  val serviceName = "service"
+  val appServices = (0 to 2).map(i => AgentService.randomObject.
+    copy(ID = s"$serviceName$i", Service = serviceName, Tags = appServiceTags))
+  val services = datasourceServices ++ agentServices ++ appServices
   val datacenter = Await.result(getDatacenter, 3 seconds)
   val nodeCatalog = Await.result(getNode, 3 seconds)
   val catalogServices = services.map { service => service.toCatalogService(datacenter, nodeCatalog)}
@@ -51,7 +55,8 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   val datasourceServiceMap = datasourceServices.map(s => s.Service -> s.Tags).toMap
   val agentServiceMap = agentServices.map(s => s.Service -> s.Tags).toMap
   val taggedServicesMap = datasourceServiceMap ++ agentServiceMap
-  val servicesMap = taggedServicesMap ++ Map[String, List[String]]("consul" -> List.empty[String])
+  val appServicesMap = appServices.map(s => s.Service -> s.Tags)
+  val servicesMap = taggedServicesMap ++ appServicesMap ++ Map[String, List[String]]("consul" -> List.empty[String])
 
   trait ActorTestSystem {
 
@@ -93,6 +98,18 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
       Await.result(discover(datasourceTags), timeout) should equal(datasourceServiceMap)
       Await.result(discover(agentTags), timeout) should equal(agentServiceMap)
       Await.result(discover(allTags), timeout) should equal(taggedServicesMap)
+
+    }
+
+    "return all services related to the same app" in new ConsulComponent with ActorTestSystem {
+
+      Await.result(discover(serviceName), timeout).get.services should have (size (appServices.size))
+
+    }
+
+    "return none if service is not found" in new ConsulComponent with ActorTestSystem {
+
+      Await.result(discover("unknown-service"), timeout) shouldBe None
 
     }
 

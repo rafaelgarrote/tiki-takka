@@ -13,18 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.columbus.test.utils.consul
+package com.stratio.tikitakka.common.model.discovery
 
-import com.stratio.tikitakka.common.test.utils.generators.GeneratorUtils
-import org.scalacheck.Gen
-
-object ConsulGeneratorUtils extends GeneratorUtils {
-
-  def genAgentService: Gen[AgentService] = for {
-    id <- genID
-    service = id
-    tags <- genTags
-    address <- genIP
-    port <- Gen.choose(80, 50000)
-  } yield AgentService(id, service, tags, address, port)
-}
+case class DiscoveryAppInfo(id: String, name: String, services: List[ServiceInfo], tags: List[String])

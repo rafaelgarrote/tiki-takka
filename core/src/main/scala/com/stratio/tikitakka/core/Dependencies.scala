@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.tikitakka.columbus.test.utils.consul
+package com.stratio.tikitakka.core
 
-import com.stratio.tikitakka.common.test.utils.generators.GeneratorUtils
-import org.scalacheck.Gen
+import akka.actor.ActorRef
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import com.stratio.tikitakka.columbus.DiscoveryComponent
 
-object ConsulGeneratorUtils extends GeneratorUtils {
+trait Dependencies {
 
-  def genAgentService: Gen[AgentService] = for {
-    id <- genID
-    service = id
-    tags <- genTags
-    address <- genIP
-    port <- Gen.choose(80, 50000)
-  } yield AgentService(id, service, tags, address, port)
+  //Actor System
+  val actorSystem: ActorSystem
+  val materializer: ActorMaterializer
+
+  //Actors
+  val discoveryActorRef: ActorRef
+  val serviceActorRef: ActorRef
+  val servicesActorRef: ActorRef
+  //TODO: add when created  val orchestratorActor: ???
+  val orchestratorActorRef: ActorRef
+
+  val discoveryComponent: DiscoveryComponent
+
 }

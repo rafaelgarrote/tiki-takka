@@ -83,6 +83,13 @@
             </dependency>
             <dependency>
                 <groupId>com.stratio.tikitakka</groupId>
+                <artifactId>common</artifactId>
+                <version>${tikitakka.common.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.stratio.tikitakka</groupId>
                 <artifactId>orchestration</artifactId>
                 <version>${tikitakka.orchestration.version}</version>
                 <type>test-jar</type>
