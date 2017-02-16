@@ -22,6 +22,12 @@ Requisites for integration Tests
 + A consul docker (docker run -d -p 8500:8500 consul)
 + A mesos cluster with marathon
 
+There is a docker compose that ups all requirements
+```bash
+cd integration-env
+docker-compose up -d
+```
+
 Continuos compilation
 + mvn compile scala:cc -DrecompileMode=incremental
 

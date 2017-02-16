@@ -16,12 +16,12 @@
 
 package com.stratio.tikitakka.updown.marathon
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpMethods._
+import akka.stream.ActorMaterializer
 import com.stratio.tikitakka.common.exceptions._
-import com.stratio.tikitakka.common.model.ContainerInfo
-import com.stratio.tikitakka.common.model.CreateApp
-import com.stratio.tikitakka.common.model.marathon.MarathonDeleteInfo
-import com.stratio.tikitakka.common.model.marathon.MarathonApplication
+import com.stratio.tikitakka.common.model.{ContainerInfo, CreateApp}
+import com.stratio.tikitakka.common.model.marathon.{MarathonApplication, MarathonDeleteInfo}
 import com.stratio.tikitakka.common.util.PlayJsonSupport._
 import com.stratio.tikitakka.common.util.{ConfigComponent, HttpRequestUtils, LogUtils}
 import com.stratio.tikitakka.updown.UpAndDownComponent
@@ -39,6 +39,7 @@ trait MarathonComponent extends UpAndDownComponent with HttpRequestUtils with Lo
   lazy val apiVersion = ConfigComponent.getString(versionField, defaultApiVersion)
 
   val upPath = s"$apiVersion/apps"
+
   def downPath(appId: String): String = s"$apiVersion/apps/$appId"
 
   def upApplication(application: CreateApp): Future[ContainerInfo] = {
@@ -73,4 +74,10 @@ object MarathonComponent {
 
   val upComponentMethod = POST
   val downComponentMethod = DELETE
+
+  def apply(implicit _system: ActorSystem, _materializer: ActorMaterializer): MarathonComponent =
+    new MarathonComponent {
+      implicit val actorMaterializer: ActorMaterializer = _materializer
+      implicit val system: ActorSystem = _system
+    }
 }

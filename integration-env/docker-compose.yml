@@ -1,0 +1,79 @@
+version: "2"
+
+networks:
+  internal:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 192.168.241.0/24
+         gateway: 192.168.241.1
+
+services:
+  consul:
+    env_file:
+      - .env
+    image: consul:${_CONSUL_VERSION}
+    networks:
+      internal:
+        ipv4_address: 192.168.241.20
+    ports:
+      - ${_CONSUL_EXPOSE_PORT}:8500
+  zk:
+    env_file:
+      - .env
+    image: jplock/zookeeper:${_ZOOKEEPER_VERSION}
+    networks:
+      internal:
+        ipv4_address: 192.168.241.2
+    ports:
+      - 2181:2181
+
+  mesos-master:
+    env_file:
+      - .env
+    image: mesosphere/mesos-master:${_MESOS_VERSION}
+    networks:
+      internal:
+        ipv4_address: 192.168.241.3
+    environment:
+      MESOS_ZK: zk://192.168.241.2:2181/mesos
+      MESOS_QUORUM: 1
+      MESOS_CLUSTER: docker-compose
+      MESOS_REGISTRY: replicated_log
+    depends_on:
+      - zk
+    ports:
+      - ${_MESOS_EXPOSE_PORT}:5050
+
+  mesos-slave:
+    image: mesosphere/mesos-slave:${_MESOS_VERSION}
+    networks:
+      internal:
+        ipv4_address: 192.168.241.4
+    environment:
+      MESOS_MASTER: zk://192.168.241.2:2181/mesos
+      MESOS_CONTAINERIZERS: docker,mesos
+      MESOS_PORT: 5051
+      MESOS_RESOURCES: ports(*):[11000-11999]
+      MESOS_WORK_DIR: /tmp/mesos
+      MESOS_HOSTNAME: 192.168.241.4
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      #- /usr/local/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zk
+      - mesos-master
+  marathon:
+    image: mesosphere/marathon:${_MARATHON_VERSION}
+    command: --zk zk://192.168.241.2:2181/mesos
+    environment:
+      MARATHON_MASTER: zk://192.168.241.2:2181/mesos
+    networks:
+      internal:
+        ipv4_address: 192.168.241.5
+    ports:
+      - ${_MARATHON_EXPOSE_PORT}:8080
+    depends_on:
+      - zk
+      - mesos-master
