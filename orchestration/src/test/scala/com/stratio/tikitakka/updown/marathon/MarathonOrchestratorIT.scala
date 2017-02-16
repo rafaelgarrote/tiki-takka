@@ -50,8 +50,11 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
           id = "app1",
           cpus = 0.2,
           mem = 100,
-          instances = 1,
-          container = ContainerInfo("centos:7", Seq()),
+          instances = Option(1),
+          user = None,
+          args = None,
+          env = None,
+          container = ContainerInfo("centos:7", Seq(), None),
           cmd = Option("tail -f /var/log/yum.log")
         )
       val testResult = Try{
@@ -65,12 +68,16 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
   }
   "thrown an exception when the endpoint is not correctly defined" in new MarathonComponent with ActorTestSystem {
     override lazy val uri = "http://ocalhost:8080"
-    val application = CreateApp("app1", 0.2, 100, 1, ContainerInfo("centos:7", Seq()))
+    val application =
+      CreateApp("app1", 0.2, 100, Option(1), None, None, None, container = ContainerInfo("centos:7", Seq(), None))
     an[ResponseException] should be thrownBy Await.result(upApplication(application), timeout)
   }
 
   "Down a application if it the app is defined" in new MarathonComponent with ActorTestSystem with MarathonTestsUtils {
-    val application = MarathonApplication("app2", 0.2, 100, 1, "centos:7", Some("tail -f /var/log/yum.log"))
+    val application =
+      MarathonApplication(
+        "app2", 0.2, 100, Option(1), None, None, None, ContainerInfo("centos:7", Seq(), None), Some("tail -f /var/log/yum.log")
+      )
 
     val result: Future[ContainerId] =
       for {

@@ -27,10 +27,10 @@ import com.stratio.tikitakka.common.model.ContainerInfo
 trait DummyUpAndDownComponent extends UpAndDownComponent {
 
   val validBuild =
-    CreateApp("validBuild", 0.2, 256, 2, ContainerInfo("containerId", Seq()))
+    CreateApp("validBuild", 0.2, 256, Option(2), None, None, None, container = ContainerInfo("containerId", Seq(), None))
 
   val invalidBuild =
-    CreateApp("invalidBuild", 0.2, 256, 2, ContainerInfo("containerId", Seq()))
+    CreateApp("invalidBuild", 0.2, 256, Option(2), None, None, None, container = ContainerInfo("containerId", Seq(), None))
 
   def upApplication(application: CreateApp): Future[ContainerId] = Future {
     if (application == validBuild) ContainerId(validBuild.id)

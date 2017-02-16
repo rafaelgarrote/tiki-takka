@@ -31,13 +31,17 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
   "MarathonComponent" should {
     "be written as json correctly" in {
       val labelsMap = Map("thisIsAKey" -> "thisIsAValue", "ThisIsAnotherKey" -> "ThisIsAnotherValue")
-      val component = marathon.MarathonApplication("andId", 0.2, 256, 2, "containerId", Some("bash -x ls"), labelsMap)
+      val component =
+        marathon.MarathonApplication(
+          "andId", 0.2, 256, Option(2), None, None, Some(Map()), ContainerInfo("containerId", Seq(), None),
+          Some("bash -x ls"), labelsMap
+        )
 
       val result = Json.toJson(component).asInstanceOf[JsObject]
 
       result.fields should contain("id", JsString(component.id))
       result.fields should contain("cpus", JsNumber(component.cpus))
-      result.fields should contain("instances", JsNumber(component.instances))
+      result.fields should contain("instances", JsNumber(component.instances.get))
       result.fields should contain("mem", JsNumber(component.mem))
       val labels = result.value("labels").as[JsObject]
       labels.value.mapValues(_.asInstanceOf[JsString].value) should equal(labelsMap)
@@ -49,8 +53,8 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
     "be read fron json correctly" in {
       val expectedComponent =
         marathon.MarathonApplication(
-          "app1", 0.2, 100, 1,
-          MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21)))),
+          "app1", 0.2, 100, Option(1), None, None, Some(Map()),
+          MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21))), "DOCKER", None),
           None, Seq.empty[MarathonHealthCheck], Map("tag" -> "tag1,tag2"))
 
       val text =

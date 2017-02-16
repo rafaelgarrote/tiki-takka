@@ -24,7 +24,10 @@ import com.stratio.tikitakka.common.model._
 case class MarathonApplication(id: String,
                                cpus: Double,
                                mem: Int,
-                               instances: Int,
+                               instances: Option[Int],
+                               user: Option[String],
+                               args: Option[String],
+                               env: Option[Map[String, String]],
                                container: MarathonContainer,
                                cmd: Option[String],
                                healthChecks: Seq[MarathonHealthCheck],
@@ -39,19 +42,47 @@ object MarathonApplication {
       cpus = buildApp.cpus,
       mem = buildApp.mem,
       instances = buildApp.instances,
-      containerId = buildApp.container.image,
+      user = buildApp.user,
+      args = buildApp.args,
+      env = buildApp.env,
+      container = buildApp.container,
       cmd = buildApp.cmd,
       labels = buildApp.labels
     )
 
-  def apply(id: String, cpus: Double, mem: Int, instances: Int, containerId: String, cmd: Option[String] = None,
-            labels: Map[String, String] = Map.empty[String, String]): MarathonApplication =
+  def apply(
+             id: String,
+             cpus: Double,
+             mem: Int,
+             instances: Option[Int],
+             user: Option[String],
+             args: Option[String],
+             env: Option[Map[String, String]],
+             container: ContainerInfo,
+             cmd: Option[String] = None,
+             labels: Map[String,String] = Map.empty[String, String]): MarathonApplication =
     new MarathonApplication(
       id,
       cpus,
       mem,
       instances,
-      MarathonContainer(Docker(containerId, Seq.empty[DockerPortMapping])),
+      user,
+      args,
+      env,
+      MarathonContainer(
+        Docker(
+          container.image,
+          container.portMappings.map { case PortMapping(p1, p2) =>
+            DockerPortMapping(p1, p2)
+          }
+        ),
+        "DOCKER",
+        container.volumes.map { volumes =>
+          volumes.map { case Volume(containerPath, hostPath, mode) =>
+            MarathonVolume(containerPath, hostPath, mode)
+          }
+        }
+      ),
       cmd,
       Seq.empty[MarathonHealthCheck],
       labels)
@@ -59,18 +90,26 @@ object MarathonApplication {
   def fromJson(id: String,
                cpus: Double,
                mem: Int,
-               instances: Int,
+               instances: Option[Int],
+               user: Option[String],
+               args: Option[String],
+               env: Option[Map[String, String]],
                container: MarathonContainer,
                cmd: Option[String],
                healthChecks: Seq[MarathonHealthCheck],
                labels: Map[String, String]) =
-    MarathonApplication(id.replaceFirst("^/", ""), cpus, mem, instances, container, cmd, healthChecks, labels)
+    MarathonApplication(
+      id.replaceFirst("^/", ""), cpus, mem, instances, user, args, env, container, cmd, healthChecks, labels
+    )
 
   // Literals
   val idLiteral = "id"
   val cpusLiteral = "cpus"
   val memLiteral = "mem"
   val instancesLiteral = "instances"
+  val userLiteral = "user"
+  val argsLiteral = "args"
+  val envLiteral = "env"
   val containerLiteral = "container"
   val cmdLiteral = "cmd"
   val healthChecksLiteral = "healthChecks"
@@ -81,7 +120,10 @@ object MarathonApplication {
     (__ \ idLiteral).read[String] and
       (__ \ cpusLiteral).read[Double] and
       (__ \ memLiteral).read[Int] and
-      (__ \ instancesLiteral).read[Int] and
+      (__ \ instancesLiteral).readNullable[Int] and
+      (__ \ userLiteral).readNullable[String] and
+      (__ \ argsLiteral).readNullable[String] and
+      (__ \ envLiteral).readNullable[Map[String, String]] and
       (__ \ containerLiteral).read[MarathonContainer] and
       (__ \ cmdLiteral).readNullable[String] and
       (__ \ healthChecksLiteral).read[Seq[MarathonHealthCheck]] and
@@ -89,7 +131,7 @@ object MarathonApplication {
     )(MarathonApplication.fromJson _)
 }
 
-case class MarathonContainer(docker: Docker, `type`: String = "DOCKER")
+case class MarathonContainer(docker: Docker, `type`: String = "DOCKER", volume: Option[Seq[MarathonVolume]])
 
 object MarathonContainer {
 
@@ -108,8 +150,20 @@ object Docker {
   val portMappingsLiteral: String = "portMappings"
   val networkLiteral: String = "network"
 
-  implicit val dockerWrites: Writes[Docker] = Json.writes[Docker]
+  implicit val writes: Writes[Docker] = Json.writes[Docker]
   implicit val reads: Reads[Docker] = Json.reads[Docker]
+}
+
+case class MarathonVolume(containerPath: String, hostPath: String, mode: String)
+
+object MarathonVolume {
+
+  val containerPathLiteral: String = "containerPath"
+  val hostPathLiteral: String = "hostPath"
+  val modeLiteral: String = "mode"
+
+  implicit val writes: Writes[MarathonVolume] = Json.writes[MarathonVolume]
+  implicit val reads: Reads[MarathonVolume] = Json.reads[MarathonVolume]
 }
 
 case class DockerPortMapping(hostPort: Int, containerPort: Int)
