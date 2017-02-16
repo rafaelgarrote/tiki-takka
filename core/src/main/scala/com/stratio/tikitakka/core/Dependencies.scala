@@ -27,11 +27,8 @@ trait Dependencies {
   val materializer: ActorMaterializer
 
   //Actors
-  val discoveryActor: DiscoveryActor
   val discoveryActorRef: ActorRef
-  val serviceActor: ServiceActor
   val serviceActorRef: ActorRef
-  val servicesActor: ServicesActor
   val servicesActorRef: ActorRef
   //TODO: add when created  val orchestratorActor: ???
   val orchestratorActorRef: ActorRef

@@ -52,15 +52,13 @@ trait ConsulComponent extends DiscoveryComponent with HttpRequestUtils with LogU
 
   def discover(serviceName: String): Future[Option[DiscoveryAppInfo]] = {
     discoverServiceRequest(serviceName) map ( response =>
-      response match {
-        case x :: _ =>
-          Some(DiscoveryAppInfo(
-            response.head.ID.getOrElse(response.head.ServiceName), //Future versions will have ID
-            response.head.ServiceName,
-            response.map(_.toDiscoveryServiceInfo),
-            response.map(_.ServiceTags).reduce(_ ++ _)
-          ))
-        case _ => None
+      response.headOption.map { head =>
+        DiscoveryAppInfo(
+          head.ID.getOrElse(response.head.ServiceName), //Future versions will have ID
+          head.ServiceName,
+          response.map(_.toDiscoveryServiceInfo),
+          response.map(_.ServiceTags).reduce(_ ++ _)
+        )
       }
     )
   }
