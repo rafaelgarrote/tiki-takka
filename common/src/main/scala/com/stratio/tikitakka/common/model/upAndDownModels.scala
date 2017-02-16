@@ -1,19 +1,19 @@
 package com.stratio.tikitakka.common.model
 
-trait ApplicationModels
+trait Container
 
 case class CreateApp(id: String,
                      cpus: Double,
                      mem: Int,
                      instances: Int,
-                     container: Container,
+                     container: ContainerInfo,
                      cmd: Option[String] = None,
                      healthChecks: Seq[HealthCheck] = Seq.empty[HealthCheck],
-                     labels: Map[String, String] = Map.empty[String, String]) extends ApplicationModels
+                     labels: Map[String, String] = Map.empty[String, String]) extends Container
 
-case class ContainerInfo(id: String)
+case class ContainerId(id: String)
 
-case class Container(image: String, portMappings: Seq[PortMapping])
+case class ContainerInfo(image: String, portMappings: Seq[PortMapping])
 
 case class PortMapping(hostPort: Int, containerPort: Int)
 

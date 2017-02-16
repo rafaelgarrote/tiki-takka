@@ -20,25 +20,25 @@ import com.stratio.tikitakka.common.exceptions.ResponseException
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-import com.stratio.tikitakka.common.model.ContainerInfo
+import com.stratio.tikitakka.common.model.ContainerId
 import com.stratio.tikitakka.common.model.CreateApp
-import com.stratio.tikitakka.common.model.Container
+import com.stratio.tikitakka.common.model.ContainerInfo
 
 trait DummyUpAndDownComponent extends UpAndDownComponent {
 
   val validBuild =
-    CreateApp("validBuild", 0.2, 256, 2, Container("containerId", Seq()))
+    CreateApp("validBuild", 0.2, 256, 2, ContainerInfo("containerId", Seq()))
 
   val invalidBuild =
-    CreateApp("invalidBuild", 0.2, 256, 2, Container("containerId", Seq()))
+    CreateApp("invalidBuild", 0.2, 256, 2, ContainerInfo("containerId", Seq()))
 
-  def upApplication(application: CreateApp): Future[ContainerInfo] = Future {
-    if (application == validBuild) ContainerInfo(validBuild.id)
+  def upApplication(application: CreateApp): Future[ContainerId] = Future {
+    if (application == validBuild) ContainerId(validBuild.id)
     else throw ResponseException("Error when up", new Exception)
   }
 
-  def downApplication(application: ContainerInfo): Future[ContainerInfo] = Future {
-    if (application.id == validBuild.id) ContainerInfo(validBuild.id)
+  def downApplication(application: ContainerId): Future[ContainerId] = Future {
+    if (application.id == validBuild.id) ContainerId(validBuild.id)
     else throw ResponseException("Error when down", new Exception)
   }
 }

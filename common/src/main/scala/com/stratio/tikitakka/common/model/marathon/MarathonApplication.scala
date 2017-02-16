@@ -28,7 +28,7 @@ case class MarathonApplication(id: String,
                                container: MarathonContainer,
                                cmd: Option[String],
                                healthChecks: Seq[MarathonHealthCheck],
-                               labels: Map[String, String]) extends ApplicationModels {
+                               labels: Map[String, String]) extends Container {
 }
 
 object MarathonApplication {

@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpMethods._
 import akka.stream.ActorMaterializer
 import com.stratio.tikitakka.common.exceptions._
-import com.stratio.tikitakka.common.model.{ContainerInfo, CreateApp}
+import com.stratio.tikitakka.common.model.{ContainerId, CreateApp}
 import com.stratio.tikitakka.common.model.marathon.{MarathonApplication, MarathonDeleteInfo}
 import com.stratio.tikitakka.common.util.PlayJsonSupport._
 import com.stratio.tikitakka.common.util.{ConfigComponent, HttpRequestUtils, LogUtils}
@@ -42,24 +42,24 @@ trait MarathonComponent extends UpAndDownComponent with HttpRequestUtils with Lo
 
   def downPath(appId: String): String = s"$apiVersion/apps/$appId"
 
-  def upApplication(application: CreateApp): Future[ContainerInfo] = {
+  def upApplication(application: CreateApp): Future[ContainerId] = {
     val marathonApp = MarathonApplication(application)
     doRequest[MarathonApplication](uri, upPath, upComponentMethod, Option(Json.toJson(marathonApp)))
       .recover { case e: Exception =>
         throw ResponseException("Error when up an application", e)
       }
       .map { case marathonAppResponse =>
-        ContainerInfo(marathonAppResponse.id)
+        ContainerId(marathonAppResponse.id)
       }
   }
 
-  override def downApplication(application: ContainerInfo): Future[ContainerInfo] =
+  override def downApplication(application: ContainerId): Future[ContainerId] =
     doRequest[MarathonDeleteInfo](uri, downPath(application.id), downComponentMethod)
       .recover {
         case e: Exception => throw ResponseException("Error when down an application", e)
       }
       .map { case marathonAppResponse =>
-        ContainerInfo(marathonAppResponse.deploymentId)
+        ContainerId(marathonAppResponse.deploymentId)
       }
 }
 

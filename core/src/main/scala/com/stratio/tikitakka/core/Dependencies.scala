@@ -30,8 +30,8 @@ trait Dependencies {
   val discoveryActorRef: ActorRef
   val serviceActorRef: ActorRef
   val servicesActorRef: ActorRef
-  //TODO: add when created  val orchestratorActor: ???
   val orchestratorActorRef: ActorRef
+  val upAndDownActorRef: ActorRef
 
   val discoveryComponent: DiscoveryComponent
 
