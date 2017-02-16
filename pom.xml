@@ -44,7 +44,6 @@
         <tikitakka.common.version>0.1.0-SNAPSHOT</tikitakka.common.version>
         <tikitakka.discovery.version>0.1.0-SNAPSHOT</tikitakka.discovery.version>
         <tikitakka.orchestration.version>0.1.0-SNAPSHOT</tikitakka.orchestration.version>
-        <tikitakka.common.version>0.1.0-SNAPSHOT</tikitakka.common.version>
         <tikitakka.core.version>0.1.0-SNAPSHOT</tikitakka.core.version>
     </properties>
 
