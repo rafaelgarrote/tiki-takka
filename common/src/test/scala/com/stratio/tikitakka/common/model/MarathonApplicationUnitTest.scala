@@ -20,10 +20,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{ShouldMatchers, WordSpec}
 import play.api.libs.json._
 
-import com.stratio.tikitakka.common.model.marathon.Docker
-import com.stratio.tikitakka.common.model.marathon.DockerPortMapping
-import com.stratio.tikitakka.common.model.marathon.MarathonContainer
-import com.stratio.tikitakka.common.model.marathon.MarathonHealthCheck
+import com.stratio.tikitakka.common.model.marathon._
 
 @RunWith(classOf[JUnitRunner])
 class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
@@ -33,11 +30,21 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
       val labelsMap = Map("thisIsAKey" -> "thisIsAValue", "ThisIsAnotherKey" -> "ThisIsAnotherValue")
       val component =
         marathon.MarathonApplication(
-          "andId", 0.2, 256, Option(2), None, None, Some(Map()), ContainerInfo("containerId", Seq(), None),
-          Some("bash -x ls"), labelsMap
+          id = "andId",
+          cpus = 0.2,
+          mem = 256,
+          instances = Option(2),
+          user = None,
+          args = None,
+          env = Some(Map()),
+          container = MarathonContainer(Docker("containerId", Seq()), "DOCKER", None),
+          cmd = Some("bash -x ls"),
+          None,
+          None,
+          labels = labelsMap
         )
 
-      val result = Json.toJson(component).asInstanceOf[JsObject]
+      val result: JsObject = Json.toJson(component).asInstanceOf[JsObject]
 
       result.fields should contain("id", JsString(component.id))
       result.fields should contain("cpus", JsNumber(component.cpus))
@@ -55,7 +62,8 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
         marathon.MarathonApplication(
           "app1", 0.2, 100, Option(1), None, None, Some(Map()),
           MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21))), "DOCKER", None),
-          None, Seq.empty[MarathonHealthCheck], Map("tag" -> "tag1,tag2"))
+          None, Option(Seq(MarathonPortDefinition(None, 0, "tcp", Map.empty[String, String]))), Some(List()),
+          Map("tag" -> "tag1,tag2"))
 
       val text =
         io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("component-marathon.json")).mkString

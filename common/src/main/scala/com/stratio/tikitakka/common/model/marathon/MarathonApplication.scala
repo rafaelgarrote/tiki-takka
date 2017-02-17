@@ -30,62 +30,56 @@ case class MarathonApplication(id: String,
                                env: Option[Map[String, String]],
                                container: MarathonContainer,
                                cmd: Option[String],
-                               healthChecks: Seq[MarathonHealthCheck],
+                               portDefinitions: Option[Seq[MarathonPortDefinition]],
+                               healthChecks: Option[Seq[MarathonHealthCheck]],
                                labels: Map[String, String]) extends Container {
 }
 
 object MarathonApplication {
 
   def apply(buildApp: CreateApp): MarathonApplication =
-    MarathonApplication(
-      id = buildApp.id,
-      cpus = buildApp.cpus,
-      mem = buildApp.mem,
-      instances = buildApp.instances,
-      user = buildApp.user,
-      args = buildApp.args,
-      env = buildApp.env,
-      container = buildApp.container,
-      cmd = buildApp.cmd,
-      labels = buildApp.labels
-    )
-
-  def apply(
-             id: String,
-             cpus: Double,
-             mem: Int,
-             instances: Option[Int],
-             user: Option[String],
-             args: Option[String],
-             env: Option[Map[String, String]],
-             container: ContainerInfo,
-             cmd: Option[String] = None,
-             labels: Map[String,String] = Map.empty[String, String]): MarathonApplication =
     new MarathonApplication(
-      id,
-      cpus,
-      mem,
-      instances,
-      user,
-      args,
-      env,
+      buildApp.id,
+      buildApp.cpus,
+      buildApp.mem,
+      buildApp.instances,
+      buildApp.user,
+      buildApp.args,
+      buildApp.env,
       MarathonContainer(
         Docker(
-          container.image,
-          container.portMappings.map { case PortMapping(p1, p2) =>
+          buildApp.container.image,
+          buildApp.container.portMappings.map { case PortMapping(p1, p2) =>
             DockerPortMapping(p1, p2)
           }
         ),
         "DOCKER",
-        container.volumes.map { volumes =>
+        buildApp.container.volumes.map { volumes =>
           volumes.map { case Volume(containerPath, hostPath, mode) =>
             MarathonVolume(containerPath, hostPath, mode)
           }
         }
       ),
-      cmd,
-      Seq.empty[MarathonHealthCheck],
-      labels)
+      buildApp.cmd,
+      buildApp.portDefinitions.map { portDefinitions =>
+        portDefinitions.map { portDefinition =>
+          MarathonPortDefinition(
+            portDefinition.name,
+            portDefinition.port,
+            portDefinition.protocol,
+            portDefinition.labels
+          )
+        }
+      },
+      buildApp.healthChecks.map { healthChecks =>
+        healthChecks.map { healthCheck =>
+          MarathonHealthCheck(healthCheck.protocol, MarathonHealthCheckCommand(healthCheck.command.value),
+            healthCheck.gracePeriodSeconds, healthCheck.IntervalSeconds, healthCheck.timeoutSeconds,
+            healthCheck.maxConsecutiveFailures, healthCheck.ignoreHttp1xx)
+        }
+      },
+      buildApp.labels
+    )
 
   def fromJson(id: String,
                cpus: Double,
@@ -96,10 +90,11 @@ object MarathonApplication {
                env: Option[Map[String, String]],
                container: MarathonContainer,
                cmd: Option[String],
-               healthChecks: Seq[MarathonHealthCheck],
+               portDefinitions: Option[Seq[MarathonPortDefinition]],
+               healthChecks: Option[Seq[MarathonHealthCheck]],
                labels: Map[String, String]) =
     MarathonApplication(
-      id.replaceFirst("^/", ""), cpus, mem, instances, user, args, env, container, cmd, healthChecks, labels
+      id.replaceFirst("^/", ""), cpus, mem, instances, user, args, env, container, cmd, portDefinitions, healthChecks, labels
     )
 
   // Literals
@@ -112,6 +107,7 @@ object MarathonApplication {
   val envLiteral = "env"
   val containerLiteral = "container"
   val cmdLiteral = "cmd"
+  val portDefinitionsLiteral = "portDefinitions"
   val healthChecksLiteral = "healthChecks"
   val labelsLiteral = "labels"
 
@@ -126,7 +122,8 @@ object MarathonApplication {
       (__ \ envLiteral).readNullable[Map[String, String]] and
       (__ \ containerLiteral).read[MarathonContainer] and
       (__ \ cmdLiteral).readNullable[String] and
-      (__ \ healthChecksLiteral).read[Seq[MarathonHealthCheck]] and
+      (__ \ portDefinitionsLiteral).readNullable[Seq[MarathonPortDefinition]] and
+      (__ \ healthChecksLiteral).readNullable[Seq[MarathonHealthCheck]] and
       (__ \ labelsLiteral).read[Map[String, String]]
     )(MarathonApplication.fromJson _)
 }
@@ -177,10 +174,28 @@ object DockerPortMapping {
   implicit val reads: Reads[DockerPortMapping] = Json.reads[DockerPortMapping]
 }
 
-case class MarathonHealthCheck(id: String)
+case class MarathonPortDefinition(name: Option[String], port: Int, protocol: String, labels: Map[String, String])
+
+object MarathonPortDefinition {
+
+  implicit val writes: Writes[MarathonPortDefinition] = Json.writes[MarathonPortDefinition]
+  implicit val reads: Reads[MarathonPortDefinition] = Json.reads[MarathonPortDefinition]
+}
+
+case class MarathonHealthCheck(protocol: String, command: MarathonHealthCheckCommand, gracePeriodSeconds: Int,
+                               IntervalSeconds: Int, timeoutSeconds: Int, maxConsecutiveFailures: Int,
+                               ignoreHttp1xx: Boolean)
 
 object MarathonHealthCheck {
 
   implicit val writes: Writes[MarathonHealthCheck] = Json.writes[MarathonHealthCheck]
   implicit val reads: Reads[MarathonHealthCheck] = Json.reads[MarathonHealthCheck]
+}
+
+case class MarathonHealthCheckCommand(value: String)
+
+object MarathonHealthCheckCommand {
+
+  implicit val writes: Writes[MarathonHealthCheckCommand] = Json.writes[MarathonHealthCheckCommand]
+  implicit val reads: Reads[MarathonHealthCheckCommand] = Json.reads[MarathonHealthCheckCommand]
 }

@@ -15,7 +15,8 @@ case class CreateApp(id: String,
                      env: Option[Map[String, String]] = None,
                      container: ContainerInfo,
                      cmd: Option[String] = None,
-                     healthChecks: Seq[HealthCheck] = Seq.empty[HealthCheck],
+                     portDefinitions: Option[Seq[PortDefinition]],
+                     healthChecks: Option[Seq[HealthCheck]] = None,
                      labels: Map[String, String] = Map.empty[String, String]) extends Container
 
 case class ContainerId(id: String)
@@ -54,11 +55,28 @@ object PortMapping {
 
 }
 
-case class HealthCheck(id: String)
+case class PortDefinition(name: Option[String], port: Int, protocol: String, labels: Map[String, String])
+
+object PortDefinition {
+
+  implicit val writes: Writes[PortDefinition] = Json.writes[PortDefinition]
+  implicit val reads: Reads[PortDefinition] = Json.reads[PortDefinition]
+}
+
+case class HealthCheck(protocol: String, command: HealthCheckCommand, gracePeriodSeconds: Int, IntervalSeconds: Int,
+                       timeoutSeconds: Int, maxConsecutiveFailures: Int, ignoreHttp1xx: Boolean)
 
 object HealthCheck {
 
   implicit val writes: Writes[HealthCheck] = Json.writes[HealthCheck]
   implicit val reads: Reads[HealthCheck] = Json.reads[HealthCheck]
-
 }
+
+case class HealthCheckCommand(value: String)
+
+object HealthCheckCommand {
+
+  implicit val writes: Writes[HealthCheckCommand] = Json.writes[HealthCheckCommand]
+  implicit val reads: Reads[HealthCheckCommand] = Json.reads[HealthCheckCommand]
+}
+
