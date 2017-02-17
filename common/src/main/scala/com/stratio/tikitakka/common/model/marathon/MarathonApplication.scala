@@ -74,7 +74,7 @@ object MarathonApplication {
       buildApp.healthChecks.map { healthChecks =>
         healthChecks.map { healthCheck =>
           MarathonHealthCheck(healthCheck.protocol, MarathonHealthCheckCommand(healthCheck.command.value),
-            healthCheck.gracePeriodSeconds, healthCheck.IntervalSeconds, healthCheck.timeoutSeconds,
+            healthCheck.gracePeriodSeconds, healthCheck.intervalSeconds, healthCheck.timeoutSeconds,
             healthCheck.maxConsecutiveFailures, healthCheck.ignoreHttp1xx)
         }
       },
@@ -183,7 +183,7 @@ object MarathonPortDefinition {
 }
 
 case class MarathonHealthCheck(protocol: String, command: MarathonHealthCheckCommand, gracePeriodSeconds: Int,
-                               IntervalSeconds: Int, timeoutSeconds: Int, maxConsecutiveFailures: Int,
+                               intervalSeconds: Int, timeoutSeconds: Int, maxConsecutiveFailures: Int,
                                ignoreHttp1xx: Boolean)
 
 object MarathonHealthCheck {

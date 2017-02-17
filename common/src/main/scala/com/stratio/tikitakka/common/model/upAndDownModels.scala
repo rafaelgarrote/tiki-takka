@@ -63,7 +63,7 @@ object PortDefinition {
   implicit val reads: Reads[PortDefinition] = Json.reads[PortDefinition]
 }
 
-case class HealthCheck(protocol: String, command: HealthCheckCommand, gracePeriodSeconds: Int, IntervalSeconds: Int,
+case class HealthCheck(protocol: String, command: HealthCheckCommand, gracePeriodSeconds: Int, intervalSeconds: Int,
                        timeoutSeconds: Int, maxConsecutiveFailures: Int, ignoreHttp1xx: Boolean)
 
 object HealthCheck {
