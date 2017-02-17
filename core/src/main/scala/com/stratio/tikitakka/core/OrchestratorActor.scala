@@ -61,6 +61,6 @@ class OrchestratorActor(upAndDownActorRef: ActorRef) extends Actor with LogUtils
 object OrchestratorActor {
   def props = Reader {
     (dependencies: Dependencies) =>
-      Props(classOf[DiscoveryActor], dependencies.upAndDownActorRef)
+      Props(classOf[OrchestratorActor], dependencies.upAndDownActorRef)
   }
 }
