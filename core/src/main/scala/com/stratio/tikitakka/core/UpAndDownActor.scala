@@ -14,8 +14,8 @@ import com.stratio.tikitakka.updown.UpAndDownComponent
 class UpAndDownActor(service: UpAndDownComponent) extends Actor with ActorLogging {
 
   def receive = {
-    case UpServiceRequest(buildApp) =>
-      service.upApplication(buildApp)
+    case UpServiceRequest(buildApp, ssoToken) =>
+      service.upApplication(buildApp, ssoToken)
         .map(UpServiceResponse)
         .recover { case (ex: Throwable) =>
           UpServiceFails(ContainerId(buildApp.id), ex.getMessage)

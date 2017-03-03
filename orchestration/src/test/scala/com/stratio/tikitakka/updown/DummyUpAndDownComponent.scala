@@ -15,26 +15,30 @@
  */
 package com.stratio.tikitakka.updown
 
+import java.net.HttpCookie
+
 import com.stratio.tikitakka.common.exceptions.ResponseException
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import com.stratio.tikitakka.common.model.ContainerId
 import com.stratio.tikitakka.common.model.CreateApp
 import com.stratio.tikitakka.common.model.ContainerInfo
+import com.stratio.tikitakka.common.model.DockerContainerInfo
 
 trait DummyUpAndDownComponent extends UpAndDownComponent {
 
   val validBuild =
-    CreateApp("validBuild", 0.2, 256, Option(2), None, None, None, container = ContainerInfo("containerId", Seq(),
-      None), None, None, None, Map.empty[String, String])
+    CreateApp("validBuild", 0.2, 256, Option(2), None, None, None,
+      container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
+      None, None, None, Map.empty[String, String])
 
   val invalidBuild =
     CreateApp("invalidBuild", 0.2, 256, Option(2), None, None, None,
-      container = ContainerInfo("containerId", Seq(), None), None, None, None, Map.empty[String, String])
+      container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
+      None, None, None, Map.empty[String, String])
 
-  def upApplication(application: CreateApp): Future[ContainerId] = Future {
+  def upApplication(application: CreateApp,  ssoToken: Option[HttpCookie]): Future[ContainerId] = Future {
     if (application == validBuild) ContainerId(validBuild.id)
     else throw ResponseException("Error when up", new Exception)
   }

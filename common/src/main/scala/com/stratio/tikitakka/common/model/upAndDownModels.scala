@@ -11,7 +11,7 @@ case class CreateApp(id: String,
                      mem: Int,
                      instances: Option[Int],
                      user: Option[String],
-                     args: Option[String] = None,
+                     args: Option[List[String]] = None,
                      env: Option[Map[String, String]] = None,
                      container: ContainerInfo,
                      cmd: Option[String] = None,
@@ -21,12 +21,21 @@ case class CreateApp(id: String,
 
 case class ContainerId(id: String)
 
-case class ContainerInfo(image: String, portMappings: Seq[PortMapping], volumes: Option[Seq[Volume]])
+case class ContainerInfo(docker: DockerContainerInfo)
+
+case class DockerContainerInfo(image: String, portMappings: Seq[PortMapping], volumes: Option[Seq[Volume]])
 
 object ContainerInfo {
 
   implicit val writes: Writes[ContainerInfo] = Json.writes[ContainerInfo]
   implicit val reads: Reads[ContainerInfo] = Json.reads[ContainerInfo]
+
+}
+
+object DockerContainerInfo {
+
+  implicit val writes: Writes[DockerContainerInfo] = Json.writes[DockerContainerInfo]
+  implicit val reads: Reads[DockerContainerInfo] = Json.reads[DockerContainerInfo]
 
 }
 
@@ -46,7 +55,7 @@ object Volume {
 
 }
 
-case class PortMapping(hostPort: Int, containerPort: Int)
+case class PortMapping(hostPort: Int, containerPort: Int, servicePort: Option[Int])
 
 object PortMapping {
 
@@ -63,8 +72,16 @@ object PortDefinition {
   implicit val reads: Reads[PortDefinition] = Json.reads[PortDefinition]
 }
 
-case class HealthCheck(protocol: String, command: HealthCheckCommand, gracePeriodSeconds: Int, intervalSeconds: Int,
-                       timeoutSeconds: Int, maxConsecutiveFailures: Int, ignoreHttp1xx: Boolean)
+case class HealthCheck(
+                        protocol: String,
+                        path: Option[String],
+                        portIndex: Option[Int],
+                        timeoutSeconds: Int,
+                        gracePeriodSeconds: Int,
+                        intervalSeconds: Int,
+                        maxConsecutiveFailures: Int,
+                        command: Option[HealthCheckCommand],
+                        ignoreHttp1xx: Option[Boolean])
 
 object HealthCheck {
 
