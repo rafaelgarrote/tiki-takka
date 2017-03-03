@@ -16,6 +16,8 @@
 
 package com.stratio.tikitakka.updown.marathon
 
+import java.net.HttpCookie
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpMethods._
 import akka.stream.ActorMaterializer
@@ -42,10 +44,11 @@ trait MarathonComponent extends UpAndDownComponent with HttpRequestUtils with Lo
 
   def downPath(appId: String): String = s"$apiVersion/apps/$appId"
 
-  def upApplication(application: CreateApp): Future[ContainerId] = {
+  def upApplication(application: CreateApp, ssoToken: Option[HttpCookie]): Future[ContainerId] = {
     val marathonApp = MarathonApplication(application)
-    doRequest[MarathonApplication](uri, upPath, upComponentMethod, Option(Json.toJson(marathonApp)))
+    doRequest[MarathonApplication](uri, upPath, upComponentMethod, Option(Json.toJson(marathonApp)), ssoToken.map(List(_)).getOrElse(Seq.empty))
       .recover { case e: Exception =>
+        e.printStackTrace()
         throw ResponseException("Error when up an application", e)
       }
       .map { case marathonAppResponse =>

@@ -26,10 +26,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
-
 import com.stratio.tikitakka.common.model.ContainerId
 import com.stratio.tikitakka.common.model.CreateApp
 import com.stratio.tikitakka.common.model.ContainerInfo
+import com.stratio.tikitakka.common.model.DockerContainerInfo
 import com.stratio.tikitakka.common.model.marathon.MarathonApplication
 
 @RunWith(classOf[JUnitRunner])
@@ -54,14 +54,14 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
           user = None,
           args = None,
           env = None,
-          container = ContainerInfo("centos:7", Seq(), None),
+          container = ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
           cmd = Option("tail -f /var/log/yum.log"),
           None,
           None,
           Map.empty[String, String]
         )
       val testResult = Try{
-        val result: Future[ContainerId] = upApplication(application)
+        val result: Future[ContainerId] = upApplication(application, None)
         Await.result(result, timeout) shouldBe an[ContainerId]
         Await.result(result, timeout).id shouldBe application.id
       }
@@ -72,15 +72,16 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
   "thrown an exception when the endpoint is not correctly defined" in new MarathonComponent with ActorTestSystem {
     override lazy val uri = "http://ocalhost:8080"
     val application =
-      CreateApp("app1", 0.2, 100, Option(1), None, None, None, container = ContainerInfo("centos:7", Seq(), None),
+      CreateApp("app1", 0.2, 100, Option(1), None, None, None,
+        container = ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
         None, None, None, Map.empty[String, String])
-    an[ResponseException] should be thrownBy Await.result(upApplication(application), timeout)
+    an[ResponseException] should be thrownBy Await.result(upApplication(application, None), timeout)
   }
 
   "Down a application if it the app is defined" in new MarathonComponent with ActorTestSystem with MarathonTestsUtils {
     val application =
       MarathonApplication(CreateApp(
-        "app2", 0.2, 100, Option(1), None, None, None, ContainerInfo("centos:7", Seq(), None),
+        "app2", 0.2, 100, Option(1), None, None, None, ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
         Some("tail -f /var/log/yum.log"), None, None
       ))
 

@@ -34,11 +34,11 @@ class UpAndDownComponentUnitTest extends WordSpec with ShouldMatchers {
 
   "A Orchestration component" should {
     "can up a component" in new DummyUpAndDownComponent with ImplicitsValues {
-      Await.result(upApplication(validBuild), timeout) shouldBe (right = ContainerId(validBuild.id))
+      Await.result(upApplication(validBuild, None), timeout) shouldBe (right = ContainerId(validBuild.id))
     }
 
     "cannot up a component if this is not correct" in new DummyUpAndDownComponent with ImplicitsValues {
-      an[ResponseException] should be thrownBy Await.result(upApplication(invalidBuild), timeout)
+      an[ResponseException] should be thrownBy Await.result(upApplication(invalidBuild, None), timeout)
 
     }
     "can down a component" in new DummyUpAndDownComponent with ImplicitsValues {

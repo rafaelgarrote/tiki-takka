@@ -1,5 +1,7 @@
 package com.stratio.tikitakka.common.util
 
+import java.net.HttpCookie
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, _}
@@ -21,22 +23,32 @@ trait HttpRequestUtils extends LazyLogging {
   def doRequest[T](uri: String,
                    resource: String,
                    method: HttpMethod = HttpMethods.GET,
-                   body: Option[JsValue] = None)(implicit ev: Unmarshaller[ResponseEntity, T]): Future[T] = {
-    logger.debug(s"Sending HTTP request to $uri")
-    val request = createRequest(uri, resource, method, body)
+                   body: Option[JsValue] = None,
+                   cookies: Seq[HttpCookie] = Seq.empty[HttpCookie])(implicit ev: Unmarshaller[ResponseEntity, T]): Future[T] = {
+    logger.debug(s"Sending HTTP request to [${method.value}] $uri/$resource")
+    val request = createRequest(uri, resource, method, body, cookies)
     for {
       response <- httpSystem.singleRequest(request)
+      status = {
+        val status = response.status.value
+        logger.debug(s"Status : $status")
+        status
+      }
       entity <- Unmarshal(response.entity).to[T]
     } yield entity
   }
 
-  private def createRequest(uri: String, resource: String, method: HttpMethod, body: Option[JsValue]): HttpRequest =
-    HttpRequest(uri = s"$uri/$resource", method = method, entity = createRequestEntityJson(body))
+  private def createRequest(uri: String, resource: String, method: HttpMethod, body: Option[JsValue], cookies: Seq[HttpCookie]): HttpRequest =
+    HttpRequest(uri = s"$uri/$resource", method = method, entity = createRequestEntityJson(body), headers = createHeaders(cookies))
 
   def createRequestEntityJson(body: Option[JsValue]): RequestEntity = body match {
-    case Some(jsBody) => HttpEntity(MediaTypes.`application/json`, jsBody.toString)
+    case Some(jsBody) =>
+      logger.debug(s"body: ${jsBody.toString()}")
+      HttpEntity(MediaTypes.`application/json`, jsBody.toString)
     case _ => HttpEntity.Empty
   }
 
+  def createHeaders(cookies: Seq[HttpCookie]): List[HttpHeader] =
+    cookies.map(c => headers.Cookie(c.getName, c.getValue)).toList
 
 }

@@ -61,7 +61,7 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
       val expectedComponent =
         marathon.MarathonApplication(
           "app1", 0.2, 100, Option(1), None, None, Some(Map()),
-          MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21))), "DOCKER", None),
+          MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21, Some(33)))), "DOCKER", None),
           None, Option(Seq(MarathonPortDefinition(None, 0, "tcp", Map.empty[String, String]))), Some(List()),
           Map("tag" -> "tag1,tag2"))
 

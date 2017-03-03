@@ -26,7 +26,7 @@ case class MarathonApplication(id: String,
                                mem: Int,
                                instances: Option[Int],
                                user: Option[String],
-                               args: Option[String],
+                               args: Option[List[String]],
                                env: Option[Map[String, String]],
                                container: MarathonContainer,
                                cmd: Option[String],
@@ -48,13 +48,13 @@ object MarathonApplication {
       buildApp.env,
       MarathonContainer(
         Docker(
-          buildApp.container.image,
-          buildApp.container.portMappings.map { case PortMapping(p1, p2) =>
-            DockerPortMapping(p1, p2)
+          buildApp.container.docker.image,
+          buildApp.container.docker.portMappings.map { case PortMapping(p1, p2, p3) =>
+            DockerPortMapping(p1, p2, p3)
           }
         ),
         "DOCKER",
-        buildApp.container.volumes.map { volumes =>
+        buildApp.container.docker.volumes.map { volumes =>
           volumes.map { case Volume(containerPath, hostPath, mode) =>
             MarathonVolume(containerPath, hostPath, mode)
           }
@@ -73,7 +73,11 @@ object MarathonApplication {
       },
       buildApp.healthChecks.map { healthChecks =>
         healthChecks.map { healthCheck =>
-          MarathonHealthCheck(healthCheck.protocol, MarathonHealthCheckCommand(healthCheck.command.value),
+          MarathonHealthCheck(
+            healthCheck.protocol,
+            healthCheck.path,
+            healthCheck.portIndex,
+            healthCheck.command.map(cmd => MarathonHealthCheckCommand(cmd.value)),
             healthCheck.gracePeriodSeconds, healthCheck.intervalSeconds, healthCheck.timeoutSeconds,
             healthCheck.maxConsecutiveFailures, healthCheck.ignoreHttp1xx)
         }
@@ -86,7 +90,7 @@ object MarathonApplication {
                mem: Int,
                instances: Option[Int],
                user: Option[String],
-               args: Option[String],
+               args: Option[List[String]],
                env: Option[Map[String, String]],
                container: MarathonContainer,
                cmd: Option[String],
@@ -118,7 +122,7 @@ object MarathonApplication {
       (__ \ memLiteral).read[Int] and
       (__ \ instancesLiteral).readNullable[Int] and
       (__ \ userLiteral).readNullable[String] and
-      (__ \ argsLiteral).readNullable[String] and
+      (__ \ argsLiteral).readNullable[List[String]] and
       (__ \ envLiteral).readNullable[Map[String, String]] and
       (__ \ containerLiteral).read[MarathonContainer] and
       (__ \ cmdLiteral).readNullable[String] and
@@ -163,7 +167,7 @@ object MarathonVolume {
   implicit val reads: Reads[MarathonVolume] = Json.reads[MarathonVolume]
 }
 
-case class DockerPortMapping(hostPort: Int, containerPort: Int)
+case class DockerPortMapping(hostPort: Int, containerPort: Int, servicePort: Option[Int])
 
 object DockerPortMapping {
 
@@ -182,9 +186,16 @@ object MarathonPortDefinition {
   implicit val reads: Reads[MarathonPortDefinition] = Json.reads[MarathonPortDefinition]
 }
 
-case class MarathonHealthCheck(protocol: String, command: MarathonHealthCheckCommand, gracePeriodSeconds: Int,
-                               intervalSeconds: Int, timeoutSeconds: Int, maxConsecutiveFailures: Int,
-                               ignoreHttp1xx: Boolean)
+case class MarathonHealthCheck(
+                                protocol: String,
+                                path: Option[String],
+                                portIndex: Option[Int],
+                                command: Option[MarathonHealthCheckCommand],
+                                gracePeriodSeconds: Int,
+                                intervalSeconds: Int,
+                                timeoutSeconds: Int,
+                                maxConsecutiveFailures: Int,
+                                ignoreHttp1xx: Option[Boolean])
 
 object MarathonHealthCheck {
 
