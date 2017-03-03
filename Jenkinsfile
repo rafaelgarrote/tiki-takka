@@ -11,6 +11,7 @@ hose {
     MAXITRETRIES = 2
     EXPOSED_PORTS = [8080]
 
+    FOSS = true
 
     ITSERVICES = [
         ['CONSUL': [
