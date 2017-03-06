@@ -57,6 +57,7 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   val taggedServicesMap = datasourceServiceMap ++ agentServiceMap
   val appServicesMap = appServices.map(s => s.Service -> s.Tags)
   val servicesMap = taggedServicesMap ++ appServicesMap ++ Map[String, List[String]]("consul" -> List.empty[String])
+  val tagList = allTags ++ appServiceTags
 
   trait ActorTestSystem {
 
@@ -88,7 +89,7 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
 
     "get all services and its info from discovery service" in new ConsulComponent with ActorTestSystem {
 
-      Await.result(discover(), timeout) should equal(servicesMap)
+      Await.result(discover(), timeout).filter(s => s._2.isEmpty || tagList.contains(s._2.head)) should equal (servicesMap)
 
     }
 
