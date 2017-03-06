@@ -52,5 +52,15 @@
             <version>${akka.version}</version>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <threadCount>0</threadCount>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
