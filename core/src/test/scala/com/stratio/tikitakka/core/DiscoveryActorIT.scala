@@ -71,7 +71,7 @@ class DiscoveryActorIT extends TestKit(ActorSystem("MySpec"))
       val servicesActor = TestActorRef[ServicesActor](new ServicesActor(orchestratorActor.ref))
       val discoveryActor = TestActorRef[DiscoveryActor](new DiscoveryActor(service, servicesActor))
 
-      discoveryActor ! DiscoverServices(List.empty[String])
+      discoveryActor ! DiscoverServices(List("theTag"))
       expectMsg(AppsDiscovered(servicesMap.toMap))
       Thread.sleep(1000)
       servicesActor.underlyingActor.services.keys should contain theSameElementsAs servicesMap.toMap.keySet
