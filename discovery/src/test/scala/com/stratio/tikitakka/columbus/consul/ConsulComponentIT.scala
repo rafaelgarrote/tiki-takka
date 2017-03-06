@@ -38,9 +38,9 @@ class ConsulComponentIT extends WordSpec with ShouldMatchers with BeforeAndAfter
   implicit val actorMaterializer = ActorMaterializer(ActorMaterializerSettings(system))
   implicit val uri = ConfigComponent.config.getString(ConsulComponent.uriField)
 
-  val datasourceTags = List[String]("datasource")
-  val agentTags = List[String]("dg-agent")
-  val appServiceTags = List[String]("app-services")
+  val datasourceTags = List[String]("datas")
+  val agentTags = List[String]("dgagent")
+  val appServiceTags = List[String]("appservices")
   val allTags = datasourceTags ++ agentTags
   val datasourceServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = datasourceTags))
   val agentServices = (0 to 5).map(_ => AgentService.randomObject.copy(Tags = agentTags))
