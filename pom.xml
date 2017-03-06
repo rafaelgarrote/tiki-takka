@@ -216,6 +216,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <threadCount>0</threadCount>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- see http://davidb.github.com/scala-maven-plugin -->
