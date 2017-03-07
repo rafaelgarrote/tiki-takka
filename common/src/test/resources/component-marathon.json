@@ -26,11 +26,10 @@
         "network": "BRIDGE",
         "portMappings": [{
           "hostPort": 12,
-          "containerPort": 21
+          "containerPort": 21,
+          "protocol": "tcp"
         }],
-        "privileged": false,
-        "parameters": [],
-        "forcePullImage": false
+        "parameters": []
       }
     },
     "healthChecks": [],
@@ -55,11 +54,9 @@
     "portDefinitions": [
       {
         "port": 0,
-        "protocol": "tcp",
-        "labels": {}
+        "protocol": "tcp"
       }
     ],
-    "requirePorts": false,
     "tasksStaged": 0,
     "tasksRunning": 0,
     "tasksHealthy": 0,

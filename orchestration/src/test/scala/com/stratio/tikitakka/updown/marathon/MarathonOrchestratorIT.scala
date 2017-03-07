@@ -56,9 +56,10 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
           env = None,
           container = ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
           cmd = Option("tail -f /var/log/yum.log"),
-          None,
-          None,
-          Map.empty[String, String]
+          portDefinitions = None,
+          requirePorts = None,
+          healthChecks = None,
+          labels = Map.empty[String, String]
         )
       val testResult = Try{
         val result: Future[ContainerId] = upApplication(application, None)
@@ -72,17 +73,40 @@ class MarathonOrchestratorIT extends WordSpec with ShouldMatchers {
   "thrown an exception when the endpoint is not correctly defined" in new MarathonComponent with ActorTestSystem {
     override lazy val uri = "http://ocalhost:8080"
     val application =
-      CreateApp("app1", 0.2, 100, Option(1), None, None, None,
+      CreateApp(
+        id = "app1",
+        cpus = 0.2,
+        mem = 100,
+        instances = Option(1),
+        user = None,
+        args = None,
+        env = None,
         container = ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
-        None, None, None, Map.empty[String, String])
+        cmd = None,
+        portDefinitions = None,
+        requirePorts = None,
+        healthChecks = None,
+        labels = Map.empty[String, String]
+      )
     an[ResponseException] should be thrownBy Await.result(upApplication(application, None), timeout)
   }
 
   "Down a application if it the app is defined" in new MarathonComponent with ActorTestSystem with MarathonTestsUtils {
     val application =
       MarathonApplication(CreateApp(
-        "app2", 0.2, 100, Option(1), None, None, None, ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
-        Some("tail -f /var/log/yum.log"), None, None
+        id = "app2",
+        cpus = 0.2,
+        mem = 100,
+        instances = Option(1),
+        user = None,
+        args = None,
+        env = None,
+        container = ContainerInfo(DockerContainerInfo("centos:7", Seq(), None)),
+        cmd = Some("tail -f /var/log/yum.log"),
+        portDefinitions = None,
+        requirePorts = None,
+        healthChecks = None,
+        labels = Map.empty[String, String]
       ))
 
     val result: Future[ContainerId] =

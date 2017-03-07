@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.tikitakka.common.model
 
 import org.junit.runner.RunWith
@@ -39,8 +40,9 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
           env = Some(Map()),
           container = MarathonContainer(Docker("containerId", Seq()), "DOCKER", None),
           cmd = Some("bash -x ls"),
-          None,
-          None,
+          portDefinitions = None,
+          healthChecks = None,
+          requirePorts = None,
           labels = labelsMap
         )
 
@@ -60,10 +62,32 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
     "be read fron json correctly" in {
       val expectedComponent =
         marathon.MarathonApplication(
-          "app1", 0.2, 100, Option(1), None, None, Some(Map()),
-          MarathonContainer(Docker("centos:7", Seq(DockerPortMapping(12, 21, None))), "DOCKER", None),
-          None, Option(Seq(MarathonPortDefinition(None, 0, "tcp", Map.empty[String, String]))), Some(List()),
-          Map("tag" -> "tag1,tag2"))
+          id = "app1",
+          cpus = 0.2,
+          mem = 100,
+          instances = Option(1),
+          user = None,
+          args = None,
+          env = Some(Map()),
+          container =
+            MarathonContainer(
+              docker = Docker(
+                image = "centos:7",
+                portMappings = Seq(DockerPortMapping(12, 21, None)),
+                parameters = Seq.empty[DockerParameter]
+              ),
+              `type` = "DOCKER",
+              volume = None
+            ),
+          cmd = None,
+          portDefinitions =
+            Option(Seq(MarathonPortDefinition(
+              name = None,
+              port = 0,
+              protocol = "tcp"
+            ))),
+          healthChecks = Some(List()),
+          labels = Map("tag" -> "tag1,tag2"))
 
       val text =
         io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("component-marathon.json")).mkString

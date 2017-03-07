@@ -29,14 +29,34 @@ import com.stratio.tikitakka.common.model.DockerContainerInfo
 trait DummyUpAndDownComponent extends UpAndDownComponent {
 
   val validBuild =
-    CreateApp("validBuild", 0.2, 256, Option(2), None, None, None,
+    CreateApp(
+      id = "validBuild",
+      cpus = 0.2,
+      mem = 256,
+      instances = Option(2),
+      user = None,
+      args = None,
+      env = None,
       container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
-      None, None, None, Map.empty[String, String])
+      cmd = None,
+      portDefinitions = None,
+      requirePorts = None,
+      labels = Map.empty[String, String])
 
   val invalidBuild =
-    CreateApp("invalidBuild", 0.2, 256, Option(2), None, None, None,
+    CreateApp(
+      id = "invalidBuild",
+      cpus = 0.2,
+      mem = 256,
+      instances = Option(2),
+      user = None,
+      args = None,
+      env = None,
       container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
-      None, None, None, Map.empty[String, String])
+      cmd = None,
+      portDefinitions = None,
+      requirePorts = None,
+      labels = Map.empty[String, String])
 
   def upApplication(application: CreateApp,  ssoToken: Option[HttpCookie]): Future[ContainerId] = Future {
     if (application == validBuild) ContainerId(validBuild.id)

@@ -24,13 +24,14 @@ trait Container
 case class CreateApp(id: String,
                      cpus: Double,
                      mem: Int,
-                     instances: Option[Int],
-                     user: Option[String],
+                     instances: Option[Int] = None,
+                     user: Option[String] = None,
                      args: Option[List[String]] = None,
                      env: Option[Map[String, String]] = None,
                      container: ContainerInfo,
                      cmd: Option[String] = None,
-                     portDefinitions: Option[Seq[PortDefinition]],
+                     portDefinitions: Option[Seq[PortDefinition]] = None,
+                     requirePorts: Option[Boolean] = None,
                      healthChecks: Option[Seq[HealthCheck]] = None,
                      labels: Map[String, String] = Map.empty[String, String]) extends Container
 
@@ -38,7 +39,22 @@ case class ContainerId(id: String)
 
 case class ContainerInfo(docker: DockerContainerInfo)
 
-case class DockerContainerInfo(image: String, portMappings: Seq[PortMapping], volumes: Option[Seq[Volume]])
+case class DockerContainerInfo(image: String,
+                               portMappings: Seq[PortMapping] = Seq.empty[PortMapping],
+                               volumes: Option[Seq[Volume]] = None,
+                               network: Option[String] = None,
+                               forcePullImage: Option[Boolean] = None,
+                               privileged: Option[Boolean] = None,
+                               parameters: Seq[Parameter] = Seq.empty[Parameter])
+
+case class Parameter(key: String, value: String)
+
+object Parameter {
+
+  implicit val writes: Writes[Parameter] = Json.writes[Parameter]
+  implicit val reads: Reads[Parameter] = Json.reads[Parameter]
+
+}
 
 object ContainerInfo {
 
@@ -70,7 +86,11 @@ object Volume {
 
 }
 
-case class PortMapping(hostPort: Int, containerPort: Int, servicePort: Option[Int])
+case class PortMapping(hostPort: Int,
+                       containerPort: Int,
+                       servicePort: Option[Int] = None,
+                       protocol: Option[String] = None,
+                       labels: Option[Map[String, String]] = None)
 
 object PortMapping {
 
@@ -79,7 +99,10 @@ object PortMapping {
 
 }
 
-case class PortDefinition(name: Option[String], port: Int, protocol: String, labels: Map[String, String])
+case class PortDefinition(name: Option[String] = None,
+                          port: Int,
+                          protocol: Option[String] = None,
+                          labels: Option[Map[String, String]] = None)
 
 object PortDefinition {
 
@@ -89,14 +112,14 @@ object PortDefinition {
 
 case class HealthCheck(
                         protocol: String,
-                        path: Option[String],
-                        portIndex: Option[Int],
+                        path: Option[String] = None,
+                        portIndex: Option[Int] = None,
                         timeoutSeconds: Int,
                         gracePeriodSeconds: Int,
                         intervalSeconds: Int,
                         maxConsecutiveFailures: Int,
-                        command: Option[HealthCheckCommand],
-                        ignoreHttp1xx: Option[Boolean])
+                        command: Option[HealthCheckCommand] = None,
+                        ignoreHttp1xx: Option[Boolean] = None)
 
 object HealthCheck {
 
