@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 (upcoming)
+
+* Inner dependecies fixed
+
 ## 0.1.1 (March 06, 2017)
 
 * Jar with sources added
