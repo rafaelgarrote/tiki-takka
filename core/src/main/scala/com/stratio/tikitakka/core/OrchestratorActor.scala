@@ -15,16 +15,15 @@
  */
 package com.stratio.tikitakka.core
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.stratio.tikitakka.common.message._
 import com.stratio.tikitakka.common.model.discovery.DiscoveryAppInfo
 import com.stratio.tikitakka.common.state.ApplicationState
-import com.stratio.tikitakka.common.util.LogUtils
 
 import scalaz.Reader
 
 
-class OrchestratorActor(upAndDownActorRef: ActorRef) extends Actor with LogUtils {
+class OrchestratorActor(upAndDownActorRef: ActorRef) extends Actor with ActorLogging {
 
   var applications: Map[String, ApplicationState] = Map.empty[String, ApplicationState]
 
@@ -42,18 +41,18 @@ class OrchestratorActor(upAndDownActorRef: ActorRef) extends Actor with LogUtils
     case GetApplicationInfo(appId) =>
       val app = applications.get(appId)
       app.fold(
-        logger.info(s"Get application info: $appId, Failure"))(_ =>
-        logger.info(s"Get application info: $appId, Success"))
+        log.info(s"Get application info: $appId, Failure"))(_ =>
+        log.info(s"Get application info: $appId, Success"))
       sender ! ResponseApplicationState(app)
     case UnregisterApplication(appId) =>
       val app = removeApplicationState(appId)
       app.fold(
-        logger.info(s"Unregister Application: $appId, Failure"))(_ =>
-        logger.info(s"Unregister Application: $appId, Success"))
+        log.info(s"Unregister Application: $appId, Failure"))(_ =>
+        log.info(s"Unregister Application: $appId, Success"))
     case RegisterApplication(app) =>
       applications.get(app.id).fold(
-        logger.info(s"Register new Application: ${app.id}"))(_ =>
-        logger.info(s"Update an Application: ${app.id}"))
+        log.info(s"Register new Application: ${app.id}"))(_ =>
+        log.info(s"Update an Application: ${app.id}"))
       addApplicationState(app)
   }
 }

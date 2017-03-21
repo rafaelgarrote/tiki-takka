@@ -21,8 +21,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpMethods._
 import akka.stream.ActorMaterializer
 import com.stratio.tikitakka.common.exceptions._
-import com.stratio.tikitakka.common.model.{ContainerId, CreateApp}
 import com.stratio.tikitakka.common.model.marathon.{MarathonApplication, MarathonDeleteInfo}
+import com.stratio.tikitakka.common.model.{ContainerId, CreateApp}
 import com.stratio.tikitakka.common.util.PlayJsonSupport._
 import com.stratio.tikitakka.common.util.{ConfigComponent, HttpRequestUtils, LogUtils}
 import com.stratio.tikitakka.updown.UpAndDownComponent

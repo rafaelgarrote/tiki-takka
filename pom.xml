@@ -99,14 +99,15 @@
     <dependencies>
         <!-- Logging -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
-        </dependency>
-        <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
             <artifactId>scala-logging_${scala.version}</artifactId>
             <version>${scala-logging}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
         </dependency>
 
         <!-- Tests -->
@@ -206,13 +207,13 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <!--<configuration>-->
-                    <!--<launchers>-->
-                        <!--<launcher>-->
-                            <!--<id>debug</id>-->
-                            <!--<mainClass>${main.class.boot}</mainClass>-->
-                        <!--</launcher>-->
-                        <!--&lt;!&ndash; you could define other launcher &ndash;&gt;-->
-                    <!--</launchers>-->
+                <!--<launchers>-->
+                <!--<launcher>-->
+                <!--<id>debug</id>-->
+                <!--<mainClass>${main.class.boot}</mainClass>-->
+                <!--</launcher>-->
+                <!--&lt;!&ndash; you could define other launcher &ndash;&gt;-->
+                <!--</launchers>-->
                 <!--</configuration>-->
             </plugin>
             <plugin>

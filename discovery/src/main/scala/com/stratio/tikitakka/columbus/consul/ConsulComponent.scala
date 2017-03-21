@@ -20,10 +20,7 @@ import akka.stream.ActorMaterializer
 import com.stratio.tikitakka.columbus.DiscoveryComponent
 import com.stratio.tikitakka.columbus.consul.model.Service
 import com.stratio.tikitakka.common.model.discovery.DiscoveryAppInfo
-import com.stratio.tikitakka.common.util.ConfigComponent
-import com.stratio.tikitakka.common.util.HttpRequestUtils
-import com.stratio.tikitakka.common.util.LogUtils
-import com.stratio.tikitakka.common.util.PlayJsonSupport
+import com.stratio.tikitakka.common.util.{ConfigComponent, HttpRequestUtils, LogUtils, PlayJsonSupport}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

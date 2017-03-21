@@ -15,17 +15,19 @@
  */
 package com.stratio.tikitakka.common.util
 
-import com.typesafe.scalalogging.LazyLogging
+import org.slf4j.{Logger, LoggerFactory}
 
-trait LogUtils extends LazyLogging {
+trait LogUtils {
+
+  val log : Logger = LoggerFactory.getLogger(getClass.getName)
 
   def logFunction[T](level: LogLevel)(message: String)(f: => T): T = {
     level match {
-      case DEBUG => logger.debug(message)
-      case ERROR => logger.error(message)
-      case INFO => logger.info(message)
-      case TRACE => logger.trace(message)
-      case WARN => logger.warn(message)
+      case DEBUG => log.debug(message)
+      case ERROR => log.error(message)
+      case INFO => log.info(message)
+      case TRACE => log.trace(message)
+      case WARN => log.warn(message)
     }
     f
   }

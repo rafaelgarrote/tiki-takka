@@ -22,13 +22,12 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, _}
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.stream.ActorMaterializer
-import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.JsValue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait HttpRequestUtils extends LazyLogging {
+trait HttpRequestUtils extends LogUtils {
 
   implicit val system: ActorSystem
   implicit val actorMaterializer: ActorMaterializer
@@ -40,13 +39,13 @@ trait HttpRequestUtils extends LazyLogging {
                    method: HttpMethod = HttpMethods.GET,
                    body: Option[JsValue] = None,
                    cookies: Seq[HttpCookie] = Seq.empty[HttpCookie])(implicit ev: Unmarshaller[ResponseEntity, T]): Future[T] = {
-    logger.debug(s"Sending HTTP request to [${method.value}] $uri/$resource")
+    log.debug(s"Sending HTTP request to [${method.value}] $uri/$resource")
     val request = createRequest(uri, resource, method, body, cookies)
     for {
       response <- httpSystem.singleRequest(request)
       status = {
         val status = response.status.value
-        logger.debug(s"Status : $status")
+        log.debug(s"Status : $status")
         status
       }
       entity <- Unmarshal(response.entity).to[T]
@@ -58,7 +57,7 @@ trait HttpRequestUtils extends LazyLogging {
 
   def createRequestEntityJson(body: Option[JsValue]): RequestEntity = body match {
     case Some(jsBody) =>
-      logger.debug(s"body: ${jsBody.toString()}")
+      log.debug(s"body: ${jsBody.toString()}")
       HttpEntity(MediaTypes.`application/json`, jsBody.toString)
     case _ => HttpEntity.Empty
   }

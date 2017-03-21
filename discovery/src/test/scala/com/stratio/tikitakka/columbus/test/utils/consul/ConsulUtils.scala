@@ -17,23 +17,17 @@ package com.stratio.tikitakka.columbus.test.utils.consul
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpEntity
-import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.HttpMethods
-import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.HttpResponse
-import akka.http.scaladsl.model.MediaTypes
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import com.typesafe.scalalogging.LazyLogging
+import com.stratio.tikitakka.columbus.test.utils.consul.NodeCatalog._
+import com.stratio.tikitakka.common.util.LogUtils
 import play.api.libs.json._
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-import NodeCatalog._
-
-trait ConsulUtils extends LazyLogging {
+trait ConsulUtils extends LogUtils {
 
   implicit val system: ActorSystem
   implicit val actorMaterializer: ActorMaterializer
