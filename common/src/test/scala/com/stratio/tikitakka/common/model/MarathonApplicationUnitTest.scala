@@ -35,14 +35,9 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
           cpus = 0.2,
           mem = 256,
           instances = Option(2),
-          user = None,
-          args = None,
           env = Some(Map()),
-          container = MarathonContainer(Docker("containerId", Seq()), "DOCKER", None),
+          container = MarathonContainer(Docker("containerId")),
           cmd = Some("bash -x ls"),
-          portDefinitions = None,
-          healthChecks = None,
-          requirePorts = None,
           labels = labelsMap
         )
 
@@ -56,7 +51,7 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
       labels.value.mapValues(_.asInstanceOf[JsString].value) should equal(labelsMap)
       val jsDocker = result.value("container").asInstanceOf[JsObject].value("docker").asInstanceOf[JsObject]
       jsDocker.fields should contain("image", JsString(component.container.docker.image))
-      jsDocker.fields should contain("network", JsString("BRIDGE"))
+      jsDocker.fields should contain("network", JsString("HOST"))
     }
 
     "be read fron json correctly" in {
@@ -66,28 +61,24 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
           cpus = 0.2,
           mem = 100,
           instances = Option(1),
-          user = None,
-          args = None,
           env = Some(Map()),
           container =
             MarathonContainer(
               docker = Docker(
                 image = "centos:7",
-                portMappings = Seq(DockerPortMapping(12, 21, None)),
-                parameters = Seq.empty[DockerParameter]
+                network = "BRIDGE",
+                portMappings = Option(Seq(DockerPortMapping(12, 21)))
               ),
-              `type` = "DOCKER",
-              volume = None
+              `type` = "DOCKER"
             ),
-          cmd = None,
           portDefinitions =
             Option(Seq(MarathonPortDefinition(
-              name = None,
               port = 0,
               protocol = "tcp"
             ))),
           healthChecks = Some(List()),
-          labels = Map("tag" -> "tag1,tag2"))
+          labels = Map("tag" -> "tag1,tag2"),
+          ports= Option(Seq(0)))
 
       val text =
         io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("component-marathon.json")).mkString

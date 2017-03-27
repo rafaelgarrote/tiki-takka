@@ -34,13 +34,7 @@ trait DummyUpAndDownComponent extends UpAndDownComponent {
       cpus = 0.2,
       mem = 256,
       instances = Option(2),
-      user = None,
-      args = None,
-      env = None,
-      container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
-      cmd = None,
-      portDefinitions = None,
-      requirePorts = None,
+      container = ContainerInfo(DockerContainerInfo("containerId")),
       labels = Map.empty[String, String])
 
   val invalidBuild =
@@ -49,13 +43,7 @@ trait DummyUpAndDownComponent extends UpAndDownComponent {
       cpus = 0.2,
       mem = 256,
       instances = Option(2),
-      user = None,
-      args = None,
-      env = None,
-      container = ContainerInfo(DockerContainerInfo("containerId", Seq(), None)),
-      cmd = None,
-      portDefinitions = None,
-      requirePorts = None,
+      container = ContainerInfo(DockerContainerInfo("containerId")),
       labels = Map.empty[String, String])
 
   def upApplication(application: CreateApp,  ssoToken: Option[HttpCookie]): Future[ContainerId] = Future {

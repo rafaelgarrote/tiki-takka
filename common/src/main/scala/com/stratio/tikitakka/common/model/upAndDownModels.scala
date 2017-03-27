@@ -33,19 +33,21 @@ case class CreateApp(id: String,
                      portDefinitions: Option[Seq[PortDefinition]] = None,
                      requirePorts: Option[Boolean] = None,
                      healthChecks: Option[Seq[HealthCheck]] = None,
-                     labels: Map[String, String] = Map.empty[String, String]) extends Container
+                     labels: Map[String, String] = Map.empty[String, String],
+                     ports: Option[Seq[Int]] = None
+                    ) extends Container
 
 case class ContainerId(id: String)
 
 case class ContainerInfo(docker: DockerContainerInfo)
 
 case class DockerContainerInfo(image: String,
-                               portMappings: Seq[PortMapping] = Seq.empty[PortMapping],
+                               portMappings: Option[Seq[PortMapping]] = None,
                                volumes: Option[Seq[Volume]] = None,
                                network: Option[String] = None,
                                forcePullImage: Option[Boolean] = None,
                                privileged: Option[Boolean] = None,
-                               parameters: Seq[Parameter] = Seq.empty[Parameter])
+                               parameters: Option[Seq[Parameter]] = None)
 
 case class Parameter(key: String, value: String)
 

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.tikitakka.common.model.marathon
 
 import play.api.libs.functional.syntax._
@@ -32,7 +33,8 @@ case class MarathonApplication(id: String,
                                portDefinitions: Option[Seq[MarathonPortDefinition]] = None,
                                requirePorts: Option[Boolean] = None,
                                healthChecks: Option[Seq[MarathonHealthCheck]] = None,
-                               labels: Map[String, String] = Map.empty[String, String]) extends Container {
+                               labels: Map[String, String] = Map.empty[String, String],
+                               ports: Option[Seq[Int]] = None) extends Container {
 }
 
 object MarathonApplication {
@@ -49,14 +51,19 @@ object MarathonApplication {
       container = MarathonContainer(
         docker = Docker(
           image = buildApp.container.docker.image,
-          portMappings = buildApp.container.docker.portMappings.map {
-            case PortMapping(hostPort, containerPort, servicePort, protocol, labels) =>
-              DockerPortMapping(hostPort, containerPort, servicePort, protocol.getOrElse(TcpValue), labels)
+          portMappings = buildApp.container.docker.portMappings.map { ports =>
+            ports.map {
+              case PortMapping(hostPort, containerPort, servicePort, protocol, labels) =>
+                DockerPortMapping(hostPort, containerPort, servicePort, protocol.getOrElse(TcpValue), labels)
+            }
           },
           network = buildApp.container.docker.network.getOrElse(BridgeValue),
-          forcePullImage = buildApp.container.docker.forcePullImage
+          forcePullImage = buildApp.container.docker.forcePullImage,
+          parameters = buildApp.container.docker.parameters.map { parameters =>
+            parameters.map { case Parameter(key, value) => DockerParameter(key, value) }
+          }
         ),
-        volume = buildApp.container.docker.volumes.map { volumes =>
+        volumes = buildApp.container.docker.volumes.map { volumes =>
           volumes.map { case Volume(containerPath, hostPath, mode) =>
             MarathonVolume(containerPath, hostPath, mode)
           }
@@ -85,7 +92,8 @@ object MarathonApplication {
             healthCheck.maxConsecutiveFailures, healthCheck.ignoreHttp1xx)
         }
       },
-      labels = buildApp.labels
+      labels = buildApp.labels,
+      ports = buildApp.ports
     )
 
   def fromJson(id: String,
@@ -100,7 +108,8 @@ object MarathonApplication {
                portDefinitions: Option[Seq[MarathonPortDefinition]],
                requirePorts: Option[Boolean],
                healthChecks: Option[Seq[MarathonHealthCheck]],
-               labels: Map[String, String]) =
+               labels: Map[String, String],
+               ports: Option[Seq[Int]]) =
     MarathonApplication(
       id = id.replaceFirst("^/", ""),
       cpus = cpus,
@@ -114,7 +123,8 @@ object MarathonApplication {
       portDefinitions = portDefinitions,
       requirePorts = requirePorts,
       healthChecks = healthChecks,
-      labels = labels
+      labels = labels,
+      ports = ports
     )
 
   // Literals
@@ -131,6 +141,7 @@ object MarathonApplication {
   val requirePortsLiteral = "requirePorts"
   val healthChecksLiteral = "healthChecks"
   val labelsLiteral = "labels"
+  val portsLiteral = "ports"
 
   //Fixed Values
   val TcpValue = "tcp"
@@ -150,11 +161,12 @@ object MarathonApplication {
       (__ \ portDefinitionsLiteral).readNullable[Seq[MarathonPortDefinition]] and
       (__ \ requirePortsLiteral).readNullable[Boolean] and
       (__ \ healthChecksLiteral).readNullable[Seq[MarathonHealthCheck]] and
-      (__ \ labelsLiteral).read[Map[String, String]]
+      (__ \ labelsLiteral).read[Map[String, String]] and
+      (__ \ portsLiteral).readNullable[Seq[Int]]
     ) (MarathonApplication.fromJson _)
 }
 
-case class MarathonContainer(docker: Docker, `type`: String = "DOCKER", volume: Option[Seq[MarathonVolume]])
+case class MarathonContainer(docker: Docker, `type`: String = "DOCKER", volumes: Option[Seq[MarathonVolume]] = None)
 
 object MarathonContainer {
 
@@ -166,10 +178,10 @@ object MarathonContainer {
 }
 
 case class Docker(image: String,
-                  portMappings: Seq[DockerPortMapping] = Seq.empty[DockerPortMapping],
-                  network: String = "BRIDGE",
+                  portMappings: Option[Seq[DockerPortMapping]] = None,
+                  network: String = "HOST",
                   privileged: Option[Boolean] = None,
-                  parameters: Seq[DockerParameter] = Seq.empty[DockerParameter],
+                  parameters: Option[Seq[DockerParameter]] = None,
                   forcePullImage: Option[Boolean] = None)
 
 object Docker {
@@ -217,7 +229,7 @@ object DockerPortMapping {
   implicit val reads: Reads[DockerPortMapping] = Json.reads[DockerPortMapping]
 }
 
-case class MarathonPortDefinition(name: Option[String],
+case class MarathonPortDefinition(name: Option[String] = None,
                                   port: Int,
                                   protocol: String = MarathonApplication.TcpValue,
                                   labels: Option[Map[String, String]] = None)
@@ -226,18 +238,17 @@ object MarathonPortDefinition {
 
   implicit val writes: Writes[MarathonPortDefinition] = Json.writes[MarathonPortDefinition]
   implicit val reads: Reads[MarathonPortDefinition] = Json.reads[MarathonPortDefinition]
-
 }
 
 case class MarathonHealthCheck(protocol: String,
-                               path: Option[String],
-                               portIndex: Option[Int],
-                               command: Option[MarathonHealthCheckCommand],
+                               path: Option[String] = None,
+                               portIndex: Option[Int] = None,
+                               command: Option[MarathonHealthCheckCommand] = None,
                                gracePeriodSeconds: Int,
                                intervalSeconds: Int,
                                timeoutSeconds: Int,
                                maxConsecutiveFailures: Int,
-                               ignoreHttp1xx: Option[Boolean])
+                               ignoreHttp1xx: Option[Boolean] = None)
 
 object MarathonHealthCheck {
 
