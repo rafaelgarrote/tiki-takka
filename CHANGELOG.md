@@ -4,7 +4,7 @@
 
 * Pending changelog
 
-## 0.2.0 (upcoming)
+## 0.2.0 (March 28, 2017)
 
 * Volumes and ports are correctly supported
 * Support custom loggers
