@@ -2,7 +2,9 @@
 
 ## 0.2.0 (upcoming)
 
-* Pending changelog
+* Volumes and ports are correctly supported
+* Support custom loggers
+* Optionals parameters
 
 ## 0.1.2 (March 10, 2017)
 
