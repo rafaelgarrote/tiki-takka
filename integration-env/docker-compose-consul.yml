@@ -1,0 +1,21 @@
+version: "2"
+
+networks:
+  consul_net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: ${NET2}.0/24
+         gateway: ${NET2}.1
+
+
+services:
+  consul:
+    env_file:
+      - .env
+    image: consul:${CONSUL_DOCKER_VERSION}
+    networks:
+      consul_net:
+        ipv4_address: ${NET2}.20
+    ports:
+      - ${CONSUL_EXPOSE_PORT}:8500

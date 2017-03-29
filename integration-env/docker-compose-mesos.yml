@@ -1,0 +1,68 @@
+version: "2"
+
+networks:
+  mesos_net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: ${NET}.0/24
+         gateway: ${NET}.1
+
+services:
+  zk:
+    env_file:
+      - .env
+    image: jplock/zookeeper:${ZOOKEEPER_VERSION}
+    networks:
+      mesos_net:
+        ipv4_address: ${NET}.2
+    ports:
+      - ${ZOOKEEPER_EXPOSE_PORT}:2181
+  mesos-master:
+    env_file:
+      - .env
+    image: mesosphere/mesos-master:${MESOS_DOCKER_VERSION}
+    networks:
+      mesos_net:
+        ipv4_address: ${NET}.3
+    environment:
+      MESOS_ZK: zk://${NET}.2:2181/mesos
+      MESOS_QUORUM: 1
+      MESOS_CLUSTER: docker-compose
+      MESOS_REGISTRY: replicated_log
+    depends_on:
+      - zk
+    ports:
+      - ${MESOS_EXPOSE_PORT}:5050
+
+  mesos-slave:
+    image: mesosphere/mesos-slave:${MESOS_DOCKER_VERSION}
+    networks:
+      mesos_net:
+        ipv4_address: ${NET}.4
+    environment:
+      MESOS_MASTER: zk://${NET}.2:2181/mesos
+      MESOS_CONTAINERIZERS: docker,mesos
+      MESOS_PORT: 5051
+      MESOS_RESOURCES: ports(*):[11000-11999]
+      MESOS_WORK_DIR: /tmp/mesos
+      MESOS_HOSTNAME: ${NET}.4
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zk
+      - mesos-master
+  marathon:
+    image: mesosphere/marathon:${MARATHON_DOCKER_VERSION}
+    command: --zk zk://${NET}.2:2181/mesos
+    environment:
+      MARATHON_MASTER: zk://${NET}.2:2181/mesos
+    networks:
+      mesos_net:
+        ipv4_address: ${NET}.5
+    ports:
+      - ${MARATHON_EXPOSE_PORT}:8080
+    depends_on:
+      - zk
+      - mesos-master
