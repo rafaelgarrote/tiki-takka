@@ -1,7 +1,7 @@
 @Library('libpipelines@master') _
 
 hose {
-    MAIL = 'governance'
+    EMAIL = 'governance'
     LANG = 'scala'
     SLACKTEAM = 'data-governance'
     MODULE = 'tiki-takka'
