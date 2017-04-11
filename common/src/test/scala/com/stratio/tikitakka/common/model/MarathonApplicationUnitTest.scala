@@ -78,7 +78,8 @@ class MarathonApplicationUnitTest extends WordSpec with ShouldMatchers {
             ))),
           healthChecks = Some(List()),
           labels = Map("tag" -> "tag1,tag2"),
-          ports= Option(Seq(0)))
+          ports= Option(Seq(0)),
+          constraints = Some(Seq(Seq("constraint"))))
 
       val text =
         io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream("component-marathon.json")).mkString

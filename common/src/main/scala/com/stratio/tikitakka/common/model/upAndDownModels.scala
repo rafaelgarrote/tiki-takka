@@ -34,7 +34,8 @@ case class CreateApp(id: String,
                      requirePorts: Option[Boolean] = None,
                      healthChecks: Option[Seq[HealthCheck]] = None,
                      labels: Map[String, String] = Map.empty[String, String],
-                     ports: Option[Seq[Int]] = None
+                     ports: Option[Seq[Int]] = None,
+                     constraints: Option[Seq[Seq[String]]] = None
                     ) extends Container
 
 case class ContainerId(id: String)

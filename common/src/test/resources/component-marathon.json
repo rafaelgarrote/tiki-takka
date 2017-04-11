@@ -11,7 +11,7 @@
     "disk": 0,
     "gpus": 0,
     "executor": "",
-    "constraints": [],
+    "constraints": [["constraint"]],
     "uris": [],
     "fetch": [],
     "storeUrls": [],

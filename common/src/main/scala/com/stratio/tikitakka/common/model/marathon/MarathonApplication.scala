@@ -34,7 +34,8 @@ case class MarathonApplication(id: String,
                                requirePorts: Option[Boolean] = None,
                                healthChecks: Option[Seq[MarathonHealthCheck]] = None,
                                labels: Map[String, String] = Map.empty[String, String],
-                               ports: Option[Seq[Int]] = None) extends Container {
+                               ports: Option[Seq[Int]] = None,
+                               constraints: Option[Seq[Seq[String]]] = None) extends Container {
 }
 
 object MarathonApplication {
@@ -93,7 +94,8 @@ object MarathonApplication {
         }
       },
       labels = buildApp.labels,
-      ports = buildApp.ports
+      ports = buildApp.ports,
+      constraints = buildApp.constraints
     )
 
   def fromJson(id: String,
@@ -109,7 +111,8 @@ object MarathonApplication {
                requirePorts: Option[Boolean],
                healthChecks: Option[Seq[MarathonHealthCheck]],
                labels: Map[String, String],
-               ports: Option[Seq[Int]]) =
+               ports: Option[Seq[Int]],
+               constraints: Option[Seq[Seq[String]]]) =
     MarathonApplication(
       id = id.replaceFirst("^/", ""),
       cpus = cpus,
@@ -124,7 +127,8 @@ object MarathonApplication {
       requirePorts = requirePorts,
       healthChecks = healthChecks,
       labels = labels,
-      ports = ports
+      ports = ports,
+      constraints = constraints
     )
 
   // Literals
@@ -142,6 +146,7 @@ object MarathonApplication {
   val healthChecksLiteral = "healthChecks"
   val labelsLiteral = "labels"
   val portsLiteral = "ports"
+  val constraintsLiteral = "constraints"
 
   //Fixed Values
   val TcpValue = "tcp"
@@ -162,7 +167,8 @@ object MarathonApplication {
       (__ \ requirePortsLiteral).readNullable[Boolean] and
       (__ \ healthChecksLiteral).readNullable[Seq[MarathonHealthCheck]] and
       (__ \ labelsLiteral).read[Map[String, String]] and
-      (__ \ portsLiteral).readNullable[Seq[Int]]
+      (__ \ portsLiteral).readNullable[Seq[Int]] and
+      (__ \ constraintsLiteral).readNullable[Seq[Seq[String]]]
     ) (MarathonApplication.fromJson _)
 }
 
