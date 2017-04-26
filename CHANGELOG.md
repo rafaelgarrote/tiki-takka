@@ -4,7 +4,7 @@
 
 * Pending changelog
 
-## 0.3.0 (upcoming)
+## 0.3.0 (April 26, 2017)
 
 * Constrains support in Marathon model
 
